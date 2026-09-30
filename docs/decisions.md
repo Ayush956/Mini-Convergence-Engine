@@ -8,7 +8,7 @@ rationale), 6 (confidence-formula critique) and 8 (AI usage).
 
 | Layer | Choice | Reason |
 | --- | --- | --- |
-| Frontend | Angular 21 + Angular Material | Angular CLI 21.2.9 already installed; Material gives usable date/time pickers without hand-rolling them |
+| Frontend | React 19 + Vite + MUI | Required stack for the frontend; MUI's date and time pickers cover the calendar-only date and the clock dialog without hand-rolling them |
 | Backend | FastAPI (Python 3.9.6) | Automatic `/docs` lets the calculation engine be verified before any UI exists |
 | Repo layout | Monorepo: `frontend/` + `backend/` | Submission checklist asks for a single repository URL |
 | Frontend host | Vercel (static build) | No cold start for static assets |
@@ -54,7 +54,7 @@ Approach and source are settled for all five.
 | Name Number | Own code, Chaldean letter table | Cheiro (1926), primary text |
 | Vedic Vara | Own code: weekday with a sunrise day-boundary rule, plus planetary ruler table | Calendar Reform Committee (1955) |
 
-Libraries used deliberately: FastAPI, Pydantic, pytest, Angular, Angular Material.
+Libraries used deliberately: FastAPI, Pydantic, pytest, React, Vite, MUI.
 No astronomy, lunar-calendar or numerology library is a dependency, not even a
 development one. Date arithmetic uses the standard library `datetime` only.
 

@@ -21,5 +21,6 @@ Work in progress. Full documentation to follow, including:
 
 ## Stack
 
-- Frontend: Angular 21 with Angular Material
+- Frontend: React 19 with Vite and MUI
+- Backend: FastAPI (Python)
 - Backend: FastAPI (Python)
