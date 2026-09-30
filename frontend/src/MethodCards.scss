@@ -1,0 +1,101 @@
+.cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  // Five cards never divide evenly, so let the grid decide how many fit and
+  // accept that the last row is short.
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: var(--gap-sm);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-xs);
+  padding: var(--gap-md);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-container-high) 60%, transparent);
+  border: 1px solid var(--outline-variant);
+
+  animation: card-in var(--duration) var(--ease-out) var(--delay, 0ms) both;
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--primary) 55%, transparent);
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-xs);
+  color: var(--primary);
+
+  svg {
+    flex: none;
+  }
+
+  h3 {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+}
+
+.result {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.detail {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--on-surface-variant);
+}
+
+.basis {
+  margin: var(--gap-xs) 0 0;
+  padding-top: var(--gap-xs);
+  border-top: 1px solid var(--outline-variant);
+
+  dt {
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--on-surface-variant);
+  }
+
+  dd {
+    margin: 0.25rem 0 0;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.notes {
+  margin: var(--gap-xs) 0 0;
+  padding-left: 1rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  // Notes only appear when something unusual happened - a cusp birth, a
+  // pre-sunrise time, a name with characters we dropped - so they are exactly
+  // what should draw the eye.
+  color: var(--tertiary);
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}

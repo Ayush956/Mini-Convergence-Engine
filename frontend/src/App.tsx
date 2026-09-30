@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import './App.scss';
 import { BirthForm } from './BirthForm';
+import { MethodCards } from './MethodCards';
 import { getReading } from './reading.api';
 import type { ApiError, Reading, ReadingRequest } from './reading.models';
 
@@ -64,13 +65,7 @@ export function App() {
             </button>
           </header>
 
-          <ul className="raw">
-            {reading.methods.map((method) => (
-              <li key={method.id}>
-                <strong>{method.label}:</strong> {method.result}
-              </li>
-            ))}
-          </ul>
+          <MethodCards methods={reading.methods} />
         </section>
       )}
     </main>
