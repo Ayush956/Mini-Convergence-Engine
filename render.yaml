@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: mini-convergence-engine-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      # Set in the Render dashboard, never committed.
+      - key: OPENROUTER_API_KEY
+        sync: false
+      # Mandated by the assignment brief; more expensive models are forbidden.
+      - key: OPENROUTER_MODEL
+        value: anthropic/claude-sonnet-5.5
+      # The deployed Vercel origin, for CORS.
+      - key: FRONTEND_ORIGIN
+        sync: false
