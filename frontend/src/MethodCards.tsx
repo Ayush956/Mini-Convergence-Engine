@@ -5,7 +5,7 @@ import RouteIcon from '@mui/icons-material/Route';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import type { SvgIconComponent } from '@mui/icons-material';
 
-import './MethodCards.scss';
+import styles from './MethodCards.module.scss';
 import type { MethodResult } from './reading.models';
 
 /** One icon per method, so the five results are scannable by shape. */
@@ -19,33 +19,33 @@ const ICONS: Record<string, SvgIconComponent> = {
 
 export function MethodCards({ methods }: { methods: MethodResult[] }) {
   return (
-    <ul className="cards">
+    <ul className={styles.cards}>
       {methods.map((method, index) => {
         const Icon = ICONS[method.id] ?? WbSunnyIcon;
 
         return (
           <li
-            className="card"
+            className={styles.card}
             key={method.id}
             // The stagger is set per card rather than by nth-child, so it
             // keeps working whatever order the backend returns.
             style={{ '--delay': `${index * 70}ms` } as React.CSSProperties}
           >
-            <div className="head">
+            <div className={styles.head}>
               <Icon fontSize="small" aria-hidden />
               <h3>{method.label}</h3>
             </div>
 
-            <p className="result">{method.result}</p>
-            <p className="detail">{method.detail}</p>
+            <p className={styles.result}>{method.result}</p>
+            <p className={styles.detail}>{method.detail}</p>
 
-            <dl className="basis">
+            <dl className={styles.basis}>
               <dt>How it was derived</dt>
               <dd>{method.basis}</dd>
             </dl>
 
             {method.notes.length > 0 && (
-              <ul className="notes">
+              <ul className={styles.notes}>
                 {method.notes.map((note) => (
                   <li key={note}>{note}</li>
                 ))}

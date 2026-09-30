@@ -1,0 +1,142 @@
+.wrap {
+  // Thirty cells will not fit a phone. Scroll sideways rather than shrink the
+  // numbers past legibility; the trait column stays pinned so a scrolled cell
+  // still has a label.
+  overflow-x: auto;
+  margin: 0 calc(var(--gap-md) * -1);
+  padding: 0 var(--gap-md);
+}
+
+.matrix {
+  width: 100%;
+  min-width: 34rem;
+  border-collapse: separate;
+  border-spacing: 0.25rem;
+
+  caption {
+    caption-side: top;
+    text-align: left;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--on-surface-variant);
+    padding-bottom: var(--gap-sm);
+    max-width: 44rem;
+  }
+
+  thead th {
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--on-surface-variant);
+    text-align: center;
+    padding: 0 0.25rem 0.25rem;
+    vertical-align: bottom;
+    line-height: 1.3;
+  }
+
+  tbody th {
+    text-align: left;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    white-space: nowrap;
+    padding-right: var(--gap-sm);
+    // Pinned against the horizontal scroll. The background has to be opaque
+    // or the scrolled cells show through it.
+    position: sticky;
+    left: 0;
+    background: var(--surface-container);
+    z-index: 1;
+  }
+
+  td {
+    min-width: 4.5rem;
+    padding: 0.5rem 0.5rem 0.4375rem;
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--surface-container-high) 55%, transparent);
+    border: 1px solid transparent;
+    text-align: center;
+    animation: cell-in var(--duration) var(--ease-out) var(--delay, 0ms) both;
+  }
+
+  // Nested so it outranks the plain cell rule above it on specificity rather
+  // than on !important.
+  td.agrees {
+    background: color-mix(in srgb, var(--strong) 14%, transparent);
+    border-color: color-mix(in srgb, var(--strong) 45%, transparent);
+  }
+}
+
+.corner {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--surface-container);
+  text-align: left;
+}
+
+.score {
+  display: block;
+  font-size: 1.125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  color: var(--weak);
+
+  .agrees & {
+    color: var(--strong);
+  }
+}
+
+.bar {
+  display: block;
+  position: relative;
+  height: 0.25rem;
+  margin-top: 0.375rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--on-surface) 12%, transparent);
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--medium);
+  // Grown from nothing so the eye lands on relative length, not absolute
+  // position. The delay matches the cell's own entrance.
+  animation: fill-in var(--duration-slow) var(--ease-out) var(--delay, 0ms) both;
+
+  .agrees & {
+    background: var(--strong);
+  }
+}
+
+.mark {
+  // The threshold is the single most important number on this screen, so it
+  // gets a physical line rather than a legend entry. It has to stay legible
+  // both against the empty track and on top of a filled bar, since a score of
+  // 8 or more covers it.
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: color-mix(in srgb, var(--surface) 85%, white);
+  box-shadow: 0 0 0 0.5px color-mix(in srgb, var(--on-surface) 40%, transparent);
+}
+
+@keyframes cell-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+@keyframes fill-in {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--fill, 0%);
+  }
+}

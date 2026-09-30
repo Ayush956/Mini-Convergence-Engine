@@ -39,7 +39,7 @@
   color: var(--on-surface-variant);
 }
 
-.server-error {
+.serverError {
   display: flex;
   align-items: flex-start;
   gap: var(--gap-sm);
@@ -56,6 +56,14 @@
     flex: none;
     color: var(--error);
     margin-top: 0.125rem;
+  }
+}
+
+.pickers {
+  // The picker fields are read-only but still open their dialog, so they have
+  // to look clickable rather than disabled.
+  :global(.MuiPickersSectionList-root) {
+    cursor: pointer;
   }
 }
 

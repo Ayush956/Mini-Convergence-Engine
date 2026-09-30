@@ -12,7 +12,7 @@ import { renderMultiSectionDigitalClockTimeView } from '@mui/x-date-pickers/time
 import dayjs, { type Dayjs } from 'dayjs';
 import { useMemo, useState } from 'react';
 
-import './BirthForm.scss';
+import styles from './BirthForm.module.scss';
 import type { ReadingRequest } from './reading.models';
 
 /** Start of the verified Chinese calendar table, mirrored from the API. */
@@ -113,7 +113,7 @@ export function BirthForm({ busy, serverError, onSubmit }: Props) {
   };
 
   return (
-    <form className="form" onSubmit={submit} noValidate>
+    <form className={styles.form} onSubmit={submit} noValidate>
       <TextField
         label="Full name"
         value={fullName}
@@ -135,7 +135,7 @@ export function BirthForm({ busy, serverError, onSubmit }: Props) {
         }}
       />
 
-      <div className="row">
+      <div className={`${styles.row} ${styles.pickers}`}>
         {/*
           Mobile variants on both, on purpose. Their field is not typeable and
           opens a dialog, which is exactly what is wanted for a birth date:
@@ -203,17 +203,17 @@ export function BirthForm({ busy, serverError, onSubmit }: Props) {
       </div>
 
       {serverError && (
-        <p className="server-error" role="alert">
+        <p className={styles.serverError} role="alert">
           <ErrorOutlineIcon fontSize="small" />
           <span>{serverError}</span>
         </p>
       )}
 
-      <div className="actions">
+      <div className={styles.actions}>
         <Button
           type="submit"
           variant="contained"
-          className="submit"
+          className={styles.submit}
           disabled={busy}
           startIcon={
             busy ? <CircularProgress size={16} color="inherit" /> : <AutoAwesomeIcon />
@@ -222,7 +222,7 @@ export function BirthForm({ busy, serverError, onSubmit }: Props) {
           {busy ? 'Calculating' : 'Run the five systems'}
         </Button>
 
-        {!busy && !valid && <span className="blocked">{blockedReason(problems)}</span>}
+        {!busy && !valid && <span className={styles.blocked}>{blockedReason(problems)}</span>}
       </div>
     </form>
   );
