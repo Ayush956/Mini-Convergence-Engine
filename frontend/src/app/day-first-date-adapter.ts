@@ -1,47 +1,26 @@
 import { Injectable } from '@angular/core';
 import { NativeDateAdapter } from '@angular/material/core';
 
-/** DD/MM/YYYY or DD-MM-YYYY, with a one- or two-digit day and month. */
-const DAY_FIRST = /^\s*(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})\s*$/;
-
 const pad = (value: number) => String(value).padStart(2, '0');
 
 /**
- * Reads and writes dates day-first.
+ * Displays calendar dates as DD/MM/YYYY.
  *
- * Material's native adapter hands the string to the Date constructor, which
- * reads 15/08/1995 as invalid and 08/15/1995 as August - so a user typing the
- * format our own placeholder asks for gets their input rejected. Typing is the
- * fast path for a birth date decades back, well faster than clicking through
- * the year picker, so it has to work.
+ * Only the display side is overridden. The date field is readonly and filled
+ * from the calendar, so nothing is ever parsed from text - which is the point:
+ * 05/06/2002 is two different dates depending on where the reader is from, and
+ * a birth date that comes back wrong but plausible is worse than one refused.
  */
 @Injectable()
 export class DayFirstDateAdapter extends NativeDateAdapter {
-  override parse(value: unknown): Date | null {
-    if (typeof value !== 'string') {
-      return super.parse(value);
-    }
-
-    const parts = DAY_FIRST.exec(value);
-    if (!parts) {
-      return super.parse(value);
-    }
-
-    const [, day, month, year] = parts.map(Number);
-    const parsed = new Date(year, month - 1, day);
-
-    // Rejects 31/02 rather than letting it roll into March, which would
-    // silently change the answer the engine gives back.
-    const rolled =
-      parsed.getDate() !== day ||
-      parsed.getMonth() !== month - 1 ||
-      parsed.getFullYear() !== year;
-
-    return rolled ? null : parsed;
-  }
-
   override format(date: Date, displayFormat: Object): string {
-    if (!this.isValid(date)) {
+    // The timepicker formats its options through this same adapter, asking
+    // for hours and minutes. Answering those with a date is how every time in
+    // the dropdown ends up reading "30/09/2026".
+    const options = displayFormat as Intl.DateTimeFormatOptions | null;
+    const wantsTime = Boolean(options?.hour ?? options?.minute ?? options?.second);
+
+    if (wantsTime || !this.isValid(date)) {
       return super.format(date, displayFormat);
     }
 

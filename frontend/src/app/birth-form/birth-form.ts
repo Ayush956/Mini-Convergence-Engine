@@ -14,13 +14,16 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { DateAdapter, MatNativeDateModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTimepickerModule } from '@angular/material/timepicker';
 
 import { DayFirstDateAdapter } from '../day-first-date-adapter';
 import { ReadingRequest } from '../reading.models';
 
-/** Bounds of the verified Chinese calendar table, mirrored from the API. */
+/** Start of the verified Chinese calendar table, mirrored from the API. */
 const EARLIEST_YEAR = 1902;
-const LATEST_YEAR = 2100;
+
+/** Only used to choose which page of years the calendar opens on. */
+const TYPICAL_AGE_YEARS = 30;
 
 /** A name has to contain at least one letter for the Chaldean table to score. */
 function mustContainALetter(control: AbstractControl): ValidationErrors | null {
@@ -43,6 +46,7 @@ function mustContainALetter(control: AbstractControl): ValidationErrors | null {
     MatInputModule,
     MatNativeDateModule,
     MatProgressSpinnerModule,
+    MatTimepickerModule,
   ],
   templateUrl: './birth-form.html',
   styleUrl: './birth-form.scss',
@@ -58,14 +62,31 @@ export class BirthForm {
   readonly submitted = output<ReadingRequest>();
 
   readonly minDate = new Date(EARLIEST_YEAR, 0, 1);
-  readonly maxDate = new Date(LATEST_YEAR, 11, 31);
+
+  /** Nobody has been born tomorrow, so the calendar stops at today. */
+  readonly maxDate = new Date();
+
+  /**
+   * Which page of years the calendar opens on.
+   *
+   * Left alone it opens on today, so every adult starts by paging backwards.
+   * A guess at a typical birth year puts the grid much closer to the answer,
+   * and it only moves the view - the value is still whatever gets clicked.
+   */
+  readonly startAtDate = new Date(
+    new Date().getFullYear() - TYPICAL_AGE_YEARS,
+    0,
+    1,
+  );
 
   private readonly fb = inject(FormBuilder);
 
   readonly form = this.fb.nonNullable.group({
     fullName: ['', [Validators.required, Validators.maxLength(120), mustContainALetter]],
     dateOfBirth: [null as Date | null, [Validators.required]],
-    timeOfBirth: ['', [Validators.required, Validators.pattern(/^([01]\d|2[0-3]):[0-5]\d$/)]],
+    // A Date, not a string: the timepicker works through the DateAdapter, and
+    // only the hours and minutes of it are ever read.
+    timeOfBirth: [null as Date | null, [Validators.required]],
   });
 
   /**
@@ -88,16 +109,16 @@ export class BirthForm {
         if (control.hasError('noLetters')) return 'A name needs at least one letter.';
         return null;
       case 'dateOfBirth':
-        if (control.hasError('required')) return 'Pick a date of birth.';
+        if (control.hasError('required')) return 'Pick a date of birth from the calendar.';
         if (control.hasError('matDatepickerMin'))
           return `Our verified calendar data starts at ${EARLIEST_YEAR}.`;
         if (control.hasError('matDatepickerMax'))
-          return `Our verified calendar data stops at ${LATEST_YEAR}.`;
-        if (control.hasError('matDatepickerParse')) return "We could not read that as a date.";
+          return 'A date of birth cannot be in the future.';
         return null;
       case 'timeOfBirth':
-        if (control.hasError('required')) return 'Enter a time, even if it is a rough one.';
-        if (control.hasError('pattern')) return 'Use 24-hour time, like 09:30 or 21:05.';
+        if (control.hasError('required')) return 'Pick a time, even if it is a rough one.';
+        if (control.hasError('matTimepickerParse'))
+          return 'We could not read that as a time. Use the clock to pick one.';
         return null;
     }
   }
@@ -129,7 +150,7 @@ export class BirthForm {
     this.submitted.emit({
       full_name: fullName.trim(),
       date_of_birth: this.toIsoDate(dateOfBirth!),
-      time_of_birth: timeOfBirth,
+      time_of_birth: this.toIsoTime(timeOfBirth!),
     });
   }
 
@@ -144,5 +165,15 @@ export class BirthForm {
     const month = `${date.getMonth() + 1}`.padStart(2, '0');
     const day = `${date.getDate()}`.padStart(2, '0');
     return `${date.getFullYear()}-${month}-${day}`;
+  }
+
+  /**
+   * Wall-clock HH:MM. The timepicker hands back a Date whose own date part is
+   * meaningless, so only the hours and minutes are read from it.
+   */
+  private toIsoTime(time: Date): string {
+    const hours = `${time.getHours()}`.padStart(2, '0');
+    const minutes = `${time.getMinutes()}`.padStart(2, '0');
+    return `${hours}:${minutes}`;
   }
 }

@@ -19,18 +19,31 @@
   <div class="row">
     <mat-form-field appearance="outline">
       <mat-label>Date of birth</mat-label>
+      <!--
+        Readonly, and the whole field opens the calendar. A birth date is
+        picked, never typed: free text invites DD/MM against MM/DD and the
+        two are indistinguishable for any day of 12 or less, so a wrong
+        answer would come back looking perfectly valid.
+      -->
       <input
         matInput
+        readonly
+        class="pick-only"
         formControlName="dateOfBirth"
         [matDatepicker]="picker"
         [min]="minDate"
         [max]="maxDate"
-        placeholder="DD/MM/YYYY"
+        placeholder="Choose a date"
+        (click)="picker.open()"
+        (keydown.enter)="picker.open()"
+        (keydown.space)="picker.open()"
       />
       <mat-datepicker-toggle matIconSuffix [for]="picker" />
-      <mat-datepicker #picker startView="multi-year" />
+      <mat-datepicker #picker startView="multi-year" [startAt]="startAtDate" />
       @if (errorFor('dateOfBirth'); as message) {
         <mat-error>{{ message }}</mat-error>
+      } @else {
+        <mat-hint>Pick from the calendar</mat-hint>
       }
     </mat-form-field>
 
@@ -39,11 +52,18 @@
       <input
         matInput
         formControlName="timeOfBirth"
-        type="time"
-        step="60"
-        placeholder="HH:MM"
+        [matTimepicker]="clock"
+        placeholder="Choose a time"
       />
-      <mat-icon matSuffix>schedule</mat-icon>
+      <mat-timepicker-toggle matIconSuffix [for]="clock" />
+      <!--
+        Half-hour options cover the usual "around half nine" recollection in
+        two clicks. Typing stays open here, unlike the date, because the
+        exact minute genuinely changes the answer at the 06:00 vara boundary
+        and at a sign cusp - and a time has no ambiguous ordering to get
+        wrong.
+      -->
+      <mat-timepicker #clock interval="30min" />
       @if (errorFor('timeOfBirth'); as message) {
         <mat-error>{{ message }}</mat-error>
       } @else {
