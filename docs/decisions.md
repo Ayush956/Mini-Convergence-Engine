@@ -209,45 +209,121 @@ need verifying — the same work, with an added dependency.
 
 ## Trait mapping and convergence scoring
 
-**Undecided — this is the core of the assignment and nothing is settled yet.** The five
-systems each emit a different kind of token (a sign, an animal, two integers, a
-weekday ruler), so they cannot be compared until every one is projected onto a single
-shared trait vocabulary. Decisions still needed:
+Re-read the brief: most of what was listed as open here is in fact specified, so these
+are not our choices to make. The brief fixes six trait dimensions — Leadership,
+Creativity, Emotional depth, Communication, Discipline, Risk appetite — each scored
+0 to 10. It fixes agreement as a score of 7 or higher, fixes N as the per-dimension
+count of agreeing methods from 0 to 5, and fixes the confidence formula. It also
+specifies the output screen: every method's result, a six-by-five matrix with each
+score visible, N and confidence per trait, and a plain-language summary.
 
-- The trait vocabulary itself: fixed closed list, or derived from the sources? A closed
-  list is defensible and testable; a derived one is more faithful but unbounded.
-- Per-system mapping tables, each with a cited source. This is README section 4 and is
-  graded, so every row needs an authority behind it, not an invented association.
-- Whether a system contributes one trait or several, and whether traits carry weights.
-  Unweighted is easier to defend; weighted needs a justification for each weight.
-- What "agreement" means: identical trait, or traits in the same cluster. Clustering
-  raises convergence scores and needs its own defence.
+So the only real design freedom is the scores themselves, and the brief says so
+explicitly: "You design the mapping... There is no single correct mapping. What matters
+is that your choices are reasoned, consistent, and documented with your sources."
+
+### How the scores are produced
+
+Every possible result needs six scores, not just the ones a given user gets: 12 sun
+signs, 12 Chinese animals, 12 Life Path values (1-9 plus 11, 22, 33), 9 name numbers
+and 7 varas. That is 52 results and **312 individual scores**.
+
+**Decision: rule-derived, with a small number of documented overrides.** Rather than
+hand-assigning 312 numbers, the scores are derived from the attributes tradition
+already assigns, so each one is traceable to a rubric instead of to a mood:
+
+- **Sun signs** from element and modality. Every sign is one of Fire/Earth/Air/Water
+  crossed with one of Cardinal/Fixed/Mutable, so twelve signs come from seven rules.
+  Each trait starts at a neutral 5, then takes the element contribution and the
+  modality contribution. Leo is Fire and Fixed, so its Leadership is 5 plus the Fire
+  contribution plus the Fixed contribution — a number nobody typed.
+- **Vara** from the ruling planet's traditional significations: Mars high on risk
+  appetite, Mercury high on communication, and so on. Seven planets, already minimal.
+- **Life Path and name number** from the standard published meanings per number, which
+  are themselves the rubric — there is nothing to compress.
+- **Chinese animals** from their traditional trait lists.
+
+An explicit `OVERRIDES` map handles the cases where the rubric fights well-attested
+tradition, each entry carrying a reason string that feeds README section 4. Scorpio is
+the obvious first case: Water and Fixed lands its emotional depth mid-range, while
+every source treats Scorpio's emotional intensity as extreme.
+
+Why rule-derived rather than hand-assigned, stated plainly because it will be asked:
+under questioning, "Leo's Leadership is 9 because Leo is Fire and Fixed, and the
+rubric gives Fire this and Fixed that on a base of 5" is an answer; "I judged it so"
+is not. It also matters for the live modification task, which is 20 minutes of the
+review: changing one rubric row updates every affected sign consistently, whereas 312
+hand-written numbers would mean editing a dozen cells and hoping they stay coherent.
+
+Honest cost of the approach: an additive rubric is a crude model of a tradition that
+is not additive, and the overrides are an admission of exactly that. Both go in the
+README rather than being hidden.
 
 ## The `1 - 1/2^N` confidence formula
 
-**Critique still to be written — README section 6.** Initial observations to develop:
+Feeds README section 6 and the 10-minute discussion at the end of the live review.
 
-- It depends only on `N`, the count of agreeing systems, and ignores how many systems
-  were consulted. Two agreeing out of two scores the same as two out of five, though
-  the second is much weaker evidence.
-- It treats the systems as independent. They are not: Life Path and Name Number are
-  both digit reductions, and Sun sign, Chinese zodiac and Vara are all functions of the
-  same birth instant. `1/2^N` is the probability of `N` independent coin flips
-  agreeing, so the premise fails.
-- It cannot return 0, and approaches 1 fast: `N = 4` already gives 93.75%, which
-  overstates confidence in what is an unfalsifiable domain.
-- Needs a concrete proposal for something better, or a reasoned argument for keeping it
-  as specified while naming its flaws.
+First, the actual behaviour, since an earlier note in this file got it wrong. The
+formula **can** return 0: `N = 0` gives `1 - 1/2^0 = 1 - 1 = 0`. The full ladder is:
+
+| N | 0 | 1 | 2 | 3 | 4 | 5 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Confidence | 0% | 50% | 75% | 87.5% | 93.75% | 96.875% |
+
+So it can express certainty of nothing but never certainty of anything, which is an
+odd asymmetry for a confidence measure.
+
+Weaknesses, strongest first:
+
+- **We control the input, so the output measures us, not the user.** The brief has us
+  design the trait mapping, and N is just a count of our own scores crossing 7. Nudging
+  a few scores from 6 to 7 raises "confidence" without any new evidence entering the
+  system. The number is a property of our rubric, presented as a property of the person.
+- **The independence premise is false.** `1/2^N` is the probability of `N` independent
+  fair coins agreeing. These five methods are not independent: Life Path and name
+  number are both digit reductions, and sun sign, Chinese zodiac and vara are all
+  functions of the same birth instant. Correlated sources agreeing is much weaker
+  evidence than the formula assumes, so it systematically overstates.
+- **The 7 threshold is a cliff with no sensitivity.** 6.9 and 7.0 are treated as
+  opposites. One method drifting by 0.1 can move a dimension from 75% to 87.5%.
+- **It discards the shape of the disagreement.** Scores of 7, 7, 7, 2, 2 and scores of
+  7, 8, 9, 6, 6 both give `N = 3` and therefore identical confidence, although the
+  second is a far more coherent picture.
+- **The first step is absurdly large.** Going from no method agreeing to exactly one
+  jumps confidence by 50 points. A single method agreeing with nothing else is not
+  "50% confidence" in anything.
+- **Diminishing returns run the wrong way for the domain.** The fifth corroborating
+  method adds only 3.1 points, so genuine unanimity is barely distinguished from a bare
+  majority.
+
+What to propose instead: report the mean score and its spread rather than a count over
+a threshold, so a dimension where everything clusters at 7 is distinguishable from one
+that is bimodal; and down-weight methods that share an input, since three readings
+derived from the same birth instant should not count as three independent votes.
+Whatever the proposal, keep the brief's formula visible alongside it — the brief asks
+for a critique of it, not a replacement for it.
 
 ## AI usage
 
-**To be recorded as the build proceeds — README section 8.** The OpenRouter key
-provided with the brief implies an LLM call somewhere in the product; decide and
-document what it is actually for (narrative summary of the convergence result is the
-obvious candidate) versus what stays deterministic. Keep the boundary explicit: the
-five calculations and the convergence score must be pure code, so results are
-reproducible and testable, with the model used only for presentation. Also log which
-AI tools were used during development, since the brief asks for that separately.
+Running log for README section 8, which asks which tools were used, for what, and the
+approximate time spent.
+
+**In the product.** The brief requires "a short plain-language summary a non-technical
+person can understand" on the output screen, and that is the one place a model earns
+its place. Constraints taken from the brief: the issued OpenRouter key must be used
+for all LLM usage, only with `anthropic/claude-sonnet-5.5`, with more expensive models
+explicitly forbidden and a USD 10 cap. Usage on the key is logged and visible to the
+reviewers and "forms part of the evaluation", so the call is real rather than stubbed.
+
+**Boundary, stated explicitly because it matters for correctness.** The five
+calculations, the trait scores and the convergence arithmetic are pure deterministic
+code with no model involvement, so every number is reproducible and unit-testable. The
+model only phrases numbers it is handed. A deterministic template fallback covers API
+failure or timeout, so a cold or rate-limited key can never leave a reviewer looking
+at a broken results page.
+
+**In development.** Cursor for research and implementation, including the source
+verification recorded above. To be updated with any other assistants used, per the
+brief's requirement to declare them.
 
 ## Open questions to resolve during research
 
