@@ -198,6 +198,33 @@ export function BirthForm({ busy, serverError, onSubmit }: Props) {
               error: Boolean(errorFor('timeOfBirth')),
               helperText: errorFor('timeOfBirth') ?? 'Assumed to be IST',
             },
+            // Styles hang off the paper, because the dialog renders in a portal
+            // outside the form. The sx on layout wins over MUI's default grid,
+            // which reserves a shortcut column this picker never uses.
+            layout: {
+              sx: {
+                width: '100%',
+                gridTemplateColumns: '1fr',
+                '& .MuiPickersLayout-toolbar': { gridColumn: '1', width: '100%' },
+                '& .MuiPickersLayout-contentWrapper': {
+                  gridColumn: '1',
+                  width: '100%',
+                  alignItems: 'stretch',
+                },
+                '& .MuiPickersLayout-actionBar': { gridColumn: '1', width: '100%' },
+                '& .MuiMultiSectionDigitalClock-root': {
+                  width: '100%',
+                  justifyContent: 'stretch',
+                  borderBottom: 0,
+                },
+                '& .MuiMultiSectionDigitalClockSection-root': {
+                  flex: '1 1 50%',
+                  width: 'auto',
+                  maxWidth: 'none',
+                },
+              },
+            },
+            mobilePaper: { className: styles.timeDialogPaper },
           }}
         />
       </div>

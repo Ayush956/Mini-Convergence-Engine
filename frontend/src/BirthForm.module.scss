@@ -67,6 +67,87 @@
   }
 }
 
+// Time picker dialog (rendered in a MUI portal). All rules are descendants of
+// the paper so they still apply outside the form tree.
+.timeDialogPaper {
+  width: min(100vw - 2rem, 22.5rem);
+  max-width: none;
+  margin-inline: auto;
+
+  :global(.MuiPickersLayout-root) {
+    // Drop the shortcut column the layout reserves but never fills.
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+
+  :global(.MuiPickersLayout-toolbar),
+  :global(.MuiPickersLayout-contentWrapper),
+  :global(.MuiPickersLayout-actionBar) {
+    grid-column: 1;
+    width: 100%;
+  }
+
+  :global(.MuiPickersLayout-contentWrapper) {
+    align-items: stretch;
+    padding-inline: var(--gap-md);
+  }
+
+  :global(.MuiPickersToolbar-root) {
+    justify-content: center;
+    padding-inline: var(--gap-md);
+  }
+
+  :global(.MuiMultiSectionDigitalClock-root) {
+    width: 100%;
+    max-width: 100%;
+    justify-content: stretch;
+    margin-inline: 0;
+    border-bottom: 0;
+  }
+
+  :global(.MuiMultiSectionDigitalClockSection-root) {
+    flex: 1 1 50%;
+    width: auto;
+    max-width: none;
+    min-width: 0;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--on-surface) 32%, transparent) transparent;
+
+    &::-webkit-scrollbar {
+      width: 0.375rem;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      margin-block: 0.625rem;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--on-surface) 26%, transparent);
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+
+    &:hover::-webkit-scrollbar-thumb {
+      background: color-mix(in srgb, var(--primary) 50%, transparent);
+      background-clip: padding-box;
+    }
+  }
+
+  :global(.MuiMultiSectionDigitalClockSection-item) {
+    width: auto;
+    margin-inline: var(--gap-xs);
+    font-variant-numeric: tabular-nums;
+    justify-content: center;
+  }
+
+  :global(.MuiPickersLayout-actionBar) {
+    justify-content: flex-end;
+    padding: var(--gap-xs) var(--gap-md) var(--gap-sm);
+  }
+}
+
 @keyframes error-in {
   from {
     opacity: 0;
