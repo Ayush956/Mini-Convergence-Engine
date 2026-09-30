@@ -17,13 +17,21 @@ import type { ApiError, Reading, ReadingRequest } from './reading.models';
  * and silence there reads as a hang.
  */
 const SLOW_AFTER_MS = 6000;
+const MOBILE_QUERY = '(max-width: 40rem)';
+
+function isMobileScreen(): boolean {
+  return typeof window !== 'undefined' && window.matchMedia(MOBILE_QUERY).matches;
+}
 
 export function App() {
   const [reading, setReading] = useState<Reading | null>(null);
   const [busy, setBusy] = useState(false);
   const [slow, setSlow] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [assistantOpen, setAssistantOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(isMobileScreen);
+  // Desktop keeps the rail open; phones start on the form and only open chat
+  // when the user taps Ask with AI.
+  const [assistantOpen, setAssistantOpen] = useState(() => !isMobileScreen());
   const resultPanel = useRef<HTMLElement | null>(null);
   const slowTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -62,8 +70,31 @@ export function App() {
 
   useEffect(() => () => clearTimeout(slowTimer.current), []);
 
-  const pageClass = assistantOpen ? styles.pageSplit : styles.pageCentered;
-  const intakeFocus = assistantOpen && !reading && !busy;
+  useEffect(() => {
+    const media = window.matchMedia(MOBILE_QUERY);
+    const sync = () => setIsMobile(media.matches);
+    sync();
+    media.addEventListener('change', sync);
+    return () => media.removeEventListener('change', sync);
+  }, []);
+
+  useEffect(() => {
+    if (!(isMobile && assistantOpen)) {
+      return;
+    }
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [isMobile, assistantOpen]);
+
+  const pageClass = assistantOpen
+    ? isMobile
+      ? styles.pageMobileChat
+      : styles.pageSplit
+    : styles.pageCentered;
+  const intakeFocus = assistantOpen && !isMobile && !reading && !busy;
 
   return (
     <div className={`${styles.page} ${pageClass}`}>
@@ -157,10 +188,14 @@ export function App() {
 
       {assistantOpen ? (
         <>
-          <div className={styles.themeOnSplit}>
-            <ThemeToggle />
-          </div>
-          <div className={styles.rightColumn}>
+          {!isMobile && (
+            <div className={styles.themeOnSplit}>
+              <ThemeToggle />
+            </div>
+          )}
+          <div
+            className={`${styles.rightColumn} ${isMobile ? styles.rightColumnFullscreen : ''}`}
+          >
             <ReadingAssistant reading={reading} open onOpenChange={setAssistantOpen} />
           </div>
         </>
