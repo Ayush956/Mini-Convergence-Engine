@@ -12,9 +12,10 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatNativeDateModule } from '@angular/material/core';
+import { DateAdapter, MatNativeDateModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
+import { DayFirstDateAdapter } from '../day-first-date-adapter';
 import { ReadingRequest } from '../reading.models';
 
 /** Bounds of the verified Chinese calendar table, mirrored from the API. */
@@ -45,6 +46,7 @@ function mustContainALetter(control: AbstractControl): ValidationErrors | null {
   ],
   templateUrl: './birth-form.html',
   styleUrl: './birth-form.scss',
+  providers: [{ provide: DateAdapter, useClass: DayFirstDateAdapter }],
 })
 export class BirthForm {
   /** Disables the form while a request is in flight. */

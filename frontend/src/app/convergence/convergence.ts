@@ -31,13 +31,18 @@ export class Convergence {
   readonly threshold = AGREEMENT_THRESHOLD;
 
   readonly rows = computed<Row[]>(() => {
+    const order = this.methods().map((method) => method.id);
     const labels = new Map(this.methods().map((m) => [m.id, m.label]));
 
     return this.traits().map((trait) => ({
       trait: trait.trait,
       n: trait.n,
       percent: trait.confidence * 100,
-      agreeing: trait.agreeing.map((id) => labels.get(id) ?? id),
+      // Listed in the matrix's column order, so a reader can check a claim by
+      // scanning left to right rather than hunting for each name.
+      agreeing: [...trait.agreeing]
+        .sort((a, b) => order.indexOf(a) - order.indexOf(b))
+        .map((id) => labels.get(id) ?? id),
       pips: Array.from({ length: METHOD_COUNT }, (_, i) => i < trait.n),
     }));
   });

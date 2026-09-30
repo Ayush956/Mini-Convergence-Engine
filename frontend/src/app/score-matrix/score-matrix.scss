@@ -117,7 +117,10 @@ td {
   top: 0;
   bottom: 0;
   width: 1px;
-  background: color-mix(in srgb, var(--mat-sys-on-surface) 55%, transparent);
+  // Has to stay legible both against the empty track and on top of a filled
+  // bar, since a score of 8 or more covers the mark.
+  background: color-mix(in srgb, var(--mat-sys-surface) 85%, white);
+  box-shadow: 0 0 0 0.5px color-mix(in srgb, var(--mat-sys-on-surface) 40%, transparent);
 }
 
 @keyframes cell-in {
