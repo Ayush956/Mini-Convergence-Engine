@@ -41,7 +41,9 @@ export function ReadingAssistant({ reading, open, onOpenChange }: Props) {
           </span>
           <div>
             <h2>Reading assistant</h2>
-            <p>Grounded in your latest calculation</p>
+            <p>
+              {reading ? 'Grounded in your latest calculation' : 'General help until you run'}
+            </p>
           </div>
         </div>
         <div className={styles.panelActions}>

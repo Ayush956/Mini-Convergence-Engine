@@ -7,6 +7,7 @@ import { MethodCards } from './MethodCards';
 import { ScoreMatrix } from './ScoreMatrix';
 import { ReadingAssistant } from './ReadingAssistant';
 import { Skeleton } from './Skeleton';
+import { ThemeToggle } from './ThemeToggle';
 import { getReading } from './reading.api';
 import type { ApiError, Reading, ReadingRequest } from './reading.models';
 
@@ -62,23 +63,28 @@ export function App() {
   useEffect(() => () => clearTimeout(slowTimer.current), []);
 
   const pageClass = assistantOpen ? styles.pageSplit : styles.pageCentered;
+  const intakeFocus = assistantOpen && !reading && !busy;
 
   return (
     <div className={`${styles.page} ${pageClass}`}>
-      <main className={styles.main}>
-        <header className={styles.masthead}>
-          <p className={styles.eyebrow}>Mini Convergence Engine</p>
-          <h1>Five systems, one birth record.</h1>
-          <p className={styles.tagline}>
-            A sun sign, a Chinese animal, two numerology numbers and a Vedic weekday are
-            calculated independently, scored against six traits, and measured for where they
-            agree.
-          </p>
-        </header>
+      <main className={`${styles.main} ${intakeFocus ? styles.mainIntake : ''}`}>
+        <div className={intakeFocus ? styles.intakeWrap : undefined}>
+          <header className={`${styles.masthead} ${intakeFocus ? styles.mastheadIntake : ''}`}>
+            <p className={styles.eyebrow}>Mini Convergence Engine</p>
+            <h1>Five systems, one birth record.</h1>
+            <p className={styles.tagline}>
+              A sun sign, a Chinese animal, two numerology numbers and a Vedic weekday are
+              calculated independently, scored against six traits, and measured for where they
+              agree.
+            </p>
+          </header>
 
-        <section className={styles.panel}>
-          <BirthForm busy={busy} serverError={error} onSubmit={run} />
-        </section>
+          <section
+            className={`${styles.panel} ${intakeFocus ? `${styles.intakePanel} ${styles.panelGlow}` : ''}`}
+          >
+            <BirthForm busy={busy} serverError={error} onSubmit={run} expanded={intakeFocus} />
+          </section>
+        </div>
 
         {busy && (
           <section className={styles.panel}>
@@ -149,11 +155,23 @@ export function App() {
         )}
       </main>
 
-      <ReadingAssistant
-        reading={reading}
-        open={assistantOpen}
-        onOpenChange={setAssistantOpen}
-      />
+      {assistantOpen ? (
+        <>
+          <div className={styles.themeOnSplit}>
+            <ThemeToggle />
+          </div>
+          <div className={styles.rightColumn}>
+            <ReadingAssistant reading={reading} open onOpenChange={setAssistantOpen} />
+          </div>
+        </>
+      ) : (
+        <>
+          <div className={styles.themeBarFixed}>
+            <ThemeToggle />
+          </div>
+          <ReadingAssistant reading={reading} open={false} onOpenChange={setAssistantOpen} />
+        </>
+      )}
     </div>
   );
 }

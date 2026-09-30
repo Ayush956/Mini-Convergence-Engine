@@ -1,14 +1,9 @@
 .rail {
-  flex: 0 0 min(26rem, 36vw);
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  max-height: 100dvh;
   min-height: 0;
   overflow: hidden;
-  border-left: 1px solid var(--outline-variant);
-  background: color-mix(in srgb, var(--surface-container) 88%, transparent);
-  backdrop-filter: blur(0.75rem);
   animation: rail-in var(--duration-slow) var(--ease-out) both;
 }
 
@@ -164,7 +159,7 @@
   background: linear-gradient(
     145deg,
     color-mix(in srgb, var(--primary) 85%, white),
-    color-mix(in srgb, var(--primary) 45%, #2d6fd4)
+    color-mix(in srgb, var(--primary) 40%, var(--nebula))
   );
   box-shadow: 0 0.5rem 1.25rem color-mix(in srgb, var(--primary) 35%, transparent);
 

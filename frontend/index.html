@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -11,17 +11,26 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <!--
-      The colour tokens arrive with the JavaScript, so this one literal keeps
-      the first paint dark instead of flashing white. It is the only colour
-      outside theme.ts.
-    -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('mce-theme');
+          var theme = stored === 'dark' ? 'dark' : 'light';
+          document.documentElement.dataset.theme = theme;
+        } catch (e) {
+          document.documentElement.dataset.theme = 'light';
+        }
+      })();
+    </script>
     <style>
-      body {
-        background-color: #141218;
+      html[data-theme='light'] body {
+        background-color: #faf6eb;
+      }
+      html[data-theme='dark'] body {
+        background-color: #070a12;
       }
     </style>
   </head>

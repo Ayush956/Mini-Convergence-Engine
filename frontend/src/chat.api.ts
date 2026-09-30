@@ -17,7 +17,7 @@ const UNREACHABLE =
 
 export async function sendChatMessage(
   message: string,
-  reading: Reading,
+  reading: Reading | null,
   history: ChatTurn[],
 ): Promise<ChatResponse> {
   let response: Response;
@@ -26,7 +26,7 @@ export async function sendChatMessage(
     response = await fetch(CHAT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, reading, history }),
+      body: JSON.stringify({ message, reading: reading ?? null, history }),
     });
   } catch {
     throw errorWith(UNREACHABLE);

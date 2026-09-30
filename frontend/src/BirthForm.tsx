@@ -23,6 +23,14 @@ const TYPICAL_AGE_YEARS = 30;
 
 const MAX_NAME_LENGTH = 120;
 
+const SYSTEMS = [
+  'Western sun sign',
+  'Chinese animal',
+  'Chaldean name',
+  'Life path',
+  'Vedic vara',
+] as const;
+
 type Field = 'fullName' | 'dateOfBirth' | 'timeOfBirth';
 
 /**
@@ -56,9 +64,11 @@ interface Props {
   busy: boolean;
   serverError: string | null;
   onSubmit: (request: ReadingRequest) => void;
+  /** Taller layout when the assistant rail is open and no reading yet. */
+  expanded?: boolean;
 }
 
-export function BirthForm({ busy, serverError, onSubmit }: Props) {
+export function BirthForm({ busy, serverError, onSubmit, expanded = false }: Props) {
   const [fullName, setFullName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState<Dayjs | null>(null);
   const [timeOfBirth, setTimeOfBirth] = useState<Dayjs | null>(null);
@@ -79,6 +89,14 @@ export function BirthForm({ busy, serverError, onSubmit }: Props) {
   // form's state that can fall out of step.
   const problems = validate(fullName, dateOfBirth, timeOfBirth);
   const valid = Object.keys(problems).length === 0;
+
+  const fieldReady = {
+    fullName: Boolean(fullName.trim()) && !problems.fullName,
+    dateOfBirth: Boolean(dateOfBirth) && !problems.dateOfBirth,
+    timeOfBirth: Boolean(timeOfBirth) && !problems.timeOfBirth,
+  };
+  const completedSteps =
+    Number(fieldReady.fullName) + Number(fieldReady.dateOfBirth) + Number(fieldReady.timeOfBirth);
 
   // Both depend only on today, so they must not be rebuilt every render - a
   // new Dayjs each time would reopen the calendar on a different page.
@@ -112,145 +130,205 @@ export function BirthForm({ busy, serverError, onSubmit }: Props) {
     });
   };
 
+  const formClass = expanded ? `${styles.form} ${styles.formExpanded}` : styles.form;
+
   return (
-    <form className={styles.form} onSubmit={submit} noValidate>
-      <TextField
-        label="Full name"
-        value={fullName}
-        placeholder="e.g. Ayush Mishra"
-        autoComplete="name"
-        required
-        error={Boolean(errorFor('fullName'))}
-        helperText={errorFor('fullName') ?? 'Used for the Chaldean name number'}
-        onChange={(event) => setFullName(event.target.value)}
-        onBlur={() => markTouched('fullName')}
-        slotProps={{
-          input: {
-            endAdornment: (
-              <InputAdornment position="end">
-                <PersonOutlineIcon fontSize="small" />
-              </InputAdornment>
-            ),
-          },
-        }}
-      />
+    <form className={formClass} onSubmit={submit} noValidate>
+      <div className={styles.formAura} aria-hidden />
 
-      <div className={`${styles.row} ${styles.pickers}`}>
-        {/*
-          Mobile variants on both, on purpose. Their field is not typeable and
-          opens a dialog, which is exactly what is wanted for a birth date:
-          05/06/2002 means two different dates depending on where the reader is
-          from, and for any day of 12 or less the two readings are
-          indistinguishable, so a mistyped date would come back as a complete,
-          plausible, wrong reading.
-        */}
-        <MobileDatePicker
-          label="Date of birth"
-          value={dateOfBirth}
-          format="DD/MM/YYYY"
-          openTo="year"
-          views={['year', 'month', 'day']}
-          minDate={minDate}
-          maxDate={maxDate}
-          referenceDate={referenceDate}
-          onChange={setDateOfBirth}
-          open={dateOpen}
-          onOpen={() => setDateOpen(true)}
-          onClose={() => {
-            setDateOpen(false);
-            markTouched('dateOfBirth');
-          }}
-          slotProps={{
-            // readOnly stops the sectioned field being typed into, leaving the
-            // calendar as the only way to set a date.
-            field: { readOnly: true },
-            textField: {
-              required: true,
-              onClick: () => setDateOpen(true),
-              error: Boolean(errorFor('dateOfBirth')),
-              helperText: errorFor('dateOfBirth') ?? 'Pick from the calendar',
-            },
-          }}
-        />
+      <header className={styles.formHeader}>
+        <div className={styles.formHeaderRow}>
+          <span className={styles.formLabel}>Birth record</span>
+          <span className={styles.formCount}>{completedSteps}/3 ready</span>
+        </div>
+        <div className={styles.progressTrack}>
+          <div
+            className={styles.progressFill}
+            style={{ width: `${(completedSteps / 3) * 100}%` }}
+          />
+        </div>
+      </header>
 
-        <MobileTimePicker
-          label="Time of birth"
-          value={timeOfBirth}
-          format="HH:mm"
-          ampm={false}
-          // Digital columns rather than the default clock face. On a 24-hour
-          // clock the hours crowd into two rings and the minutes have to be
-          // aimed at, and the exact minute matters here: it decides the vara
-          // either side of 06:00, and the sign either side of a cusp.
-          viewRenderers={DIGITAL_COLUMNS}
-          onChange={setTimeOfBirth}
-          open={timeOpen}
-          onOpen={() => setTimeOpen(true)}
-          onClose={() => {
-            setTimeOpen(false);
-            markTouched('timeOfBirth');
-          }}
-          slotProps={{
-            field: { readOnly: true },
-            textField: {
-              required: true,
-              onClick: () => setTimeOpen(true),
-              error: Boolean(errorFor('timeOfBirth')),
-              helperText: errorFor('timeOfBirth') ?? 'Assumed to be IST',
-            },
-            // Styles hang off the paper, because the dialog renders in a portal
-            // outside the form. The sx on layout wins over MUI's default grid,
-            // which reserves a shortcut column this picker never uses.
-            layout: {
-              sx: {
-                width: '100%',
-                gridTemplateColumns: '1fr',
-                '& .MuiPickersLayout-toolbar': { gridColumn: '1', width: '100%' },
-                '& .MuiPickersLayout-contentWrapper': {
-                  gridColumn: '1',
-                  width: '100%',
-                  alignItems: 'stretch',
-                },
-                '& .MuiPickersLayout-actionBar': { gridColumn: '1', width: '100%' },
-                '& .MuiMultiSectionDigitalClock-root': {
-                  width: '100%',
-                  justifyContent: 'stretch',
-                  borderBottom: 0,
-                },
-                '& .MuiMultiSectionDigitalClockSection-root': {
-                  flex: '1 1 50%',
-                  width: 'auto',
-                  maxWidth: 'none',
-                },
-              },
-            },
-            mobilePaper: { className: styles.timeDialogPaper },
-          }}
-        />
-      </div>
-
-      {serverError && (
-        <p className={styles.serverError} role="alert">
-          <ErrorOutlineIcon fontSize="small" />
-          <span>{serverError}</span>
-        </p>
-      )}
-
-      <div className={styles.actions}>
-        <Button
-          type="submit"
-          variant="contained"
-          className={styles.submit}
-          disabled={busy}
-          startIcon={
-            busy ? <CircularProgress size={16} color="inherit" /> : <AutoAwesomeIcon />
-          }
+      <div className={styles.fieldStack}>
+        <div
+          className={`${styles.fieldCard} ${fieldReady.fullName ? styles.fieldCardReady : ''}`}
+          style={{ animationDelay: '40ms' }}
         >
-          {busy ? 'Calculating' : 'Run the five systems'}
-        </Button>
+          <span className={styles.fieldStep} aria-hidden>
+            01
+          </span>
+          <TextField
+            label="Full name"
+            value={fullName}
+            placeholder="e.g. Ayush Mishra"
+            autoComplete="name"
+            required
+            error={Boolean(errorFor('fullName'))}
+            helperText={errorFor('fullName') ?? 'Used for the Chaldean name number'}
+            onChange={(event) => setFullName(event.target.value)}
+            onBlur={() => markTouched('fullName')}
+            slotProps={{
+              input: {
+                className: styles.fieldInput,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <PersonOutlineIcon fontSize="small" />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+        </div>
 
-        {!busy && !valid && <span className={styles.blocked}>{blockedReason(problems)}</span>}
+        <div
+          className={`${styles.fieldCard} ${styles.fieldCardSplit} ${fieldReady.dateOfBirth && fieldReady.timeOfBirth ? styles.fieldCardReady : ''}`}
+          style={{ animationDelay: '120ms' }}
+        >
+          <span className={styles.fieldStep} aria-hidden>
+            02
+          </span>
+          <div className={`${styles.row} ${styles.pickers}`}>
+            {/*
+              Mobile variants on both, on purpose. Their field is not typeable and
+              opens a dialog, which is exactly what is wanted for a birth date:
+              05/06/2002 means two different dates depending on where the reader is
+              from, and for any day of 12 or less the two readings are
+              indistinguishable, so a mistyped date would come back as a complete,
+              plausible, wrong reading.
+            */}
+            <div className={styles.pickerWrap}>
+              <MobileDatePicker
+                label="Date of birth"
+                value={dateOfBirth}
+                format="DD/MM/YYYY"
+                openTo="year"
+                views={['year', 'month', 'day']}
+                minDate={minDate}
+                maxDate={maxDate}
+                referenceDate={referenceDate}
+                onChange={setDateOfBirth}
+                open={dateOpen}
+                onOpen={() => setDateOpen(true)}
+                onClose={() => {
+                  setDateOpen(false);
+                  markTouched('dateOfBirth');
+                }}
+                slotProps={{
+                  // readOnly stops the sectioned field being typed into, leaving the
+                  // calendar as the only way to set a date.
+                  field: { readOnly: true },
+                  textField: {
+                    required: true,
+                    onClick: () => setDateOpen(true),
+                    error: Boolean(errorFor('dateOfBirth')),
+                    helperText: errorFor('dateOfBirth') ?? 'Pick from the calendar',
+                    className: styles.pickerField,
+                  },
+                }}
+              />
+            </div>
+
+            <div className={styles.pickerWrap}>
+              <MobileTimePicker
+                label="Time of birth"
+                value={timeOfBirth}
+                format="HH:mm"
+                ampm={false}
+                // Digital columns rather than the default clock face. On a 24-hour
+                // clock the hours crowd into two rings and the minutes have to be
+                // aimed at, and the exact minute matters here: it decides the vara
+                // either side of 06:00, and the sign either side of a cusp.
+                viewRenderers={DIGITAL_COLUMNS}
+                onChange={setTimeOfBirth}
+                open={timeOpen}
+                onOpen={() => setTimeOpen(true)}
+                onClose={() => {
+                  setTimeOpen(false);
+                  markTouched('timeOfBirth');
+                }}
+                slotProps={{
+                  field: { readOnly: true },
+                  textField: {
+                    required: true,
+                    onClick: () => setTimeOpen(true),
+                    error: Boolean(errorFor('timeOfBirth')),
+                    helperText: errorFor('timeOfBirth') ?? 'Assumed to be IST',
+                    className: styles.pickerField,
+                  },
+                  // Styles hang off the paper, because the dialog renders in a portal
+                  // outside the form. The sx on layout wins over MUI's default grid,
+                  // which reserves a shortcut column this picker never uses.
+                  layout: {
+                    sx: {
+                      width: '100%',
+                      gridTemplateColumns: '1fr',
+                      '& .MuiPickersLayout-toolbar': { gridColumn: '1', width: '100%' },
+                      '& .MuiPickersLayout-contentWrapper': {
+                        gridColumn: '1',
+                        width: '100%',
+                        alignItems: 'stretch',
+                      },
+                      '& .MuiPickersLayout-actionBar': { gridColumn: '1', width: '100%' },
+                      '& .MuiMultiSectionDigitalClock-root': {
+                        width: '100%',
+                        justifyContent: 'stretch',
+                        borderBottom: 0,
+                      },
+                      '& .MuiMultiSectionDigitalClockSection-root': {
+                        flex: '1 1 50%',
+                        width: 'auto',
+                        maxWidth: 'none',
+                      },
+                    },
+                  },
+                  mobilePaper: { className: styles.timeDialogPaper },
+                }}
+              />
+            </div>
+          </div>
+        </div>
       </div>
+
+      <footer className={styles.formFooter}>
+        <div className={styles.systemStrip} aria-hidden>
+          <p className={styles.systemStripLabel}>Five systems waiting</p>
+          <ul className={styles.systemList}>
+            {SYSTEMS.map((name, index) => (
+              <li
+                key={name}
+                className={`${styles.systemChip} ${valid ? styles.systemChipLive : ''}`}
+                style={{ animationDelay: `${200 + index * 70}ms` }}
+              >
+                {name}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {serverError && (
+          <p className={styles.serverError} role="alert">
+            <ErrorOutlineIcon fontSize="small" />
+            <span>{serverError}</span>
+          </p>
+        )}
+
+        <div className={styles.actions}>
+          <Button
+            type="submit"
+            variant="contained"
+            size="medium"
+            className={`${styles.submit} ${valid && !busy ? styles.submitReady : ''}`}
+            disabled={busy}
+            startIcon={
+              busy ? <CircularProgress size={16} color="inherit" /> : <AutoAwesomeIcon />
+            }
+          >
+            {busy ? 'Calculating' : 'Run the five systems'}
+          </Button>
+
+          {!busy && !valid && <span className={styles.blocked}>{blockedReason(problems)}</span>}
+        </div>
+      </footer>
     </form>
   );
 }

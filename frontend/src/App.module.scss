@@ -3,6 +3,9 @@
   flex-direction: row;
   align-items: stretch;
   gap: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .pageCentered {
@@ -20,6 +23,8 @@
 // Viewport-high shell: the reading scrolls on the left; the assistant stays
 // one screen tall and scrolls inside its own message list.
 .pageSplit {
+  --rail-width: min(26rem, 36vw);
+  position: relative;
   height: 100vh;
   height: 100dvh;
   max-height: 100dvh;
@@ -50,6 +55,52 @@
   flex-direction: column;
   gap: var(--gap-lg);
   padding: var(--gap-xl) var(--gap-md);
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.mainIntake {
+  min-height: 100%;
+}
+
+.intakeWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-lg);
+}
+
+.intakePanel {
+  display: flex;
+  flex-direction: column;
+  padding: var(--gap-lg);
+  overflow: hidden;
+}
+
+.panelGlow {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--primary) 35%, transparent),
+      transparent 40%,
+      color-mix(in srgb, var(--tertiary) 25%, transparent)
+    );
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0.7;
+    animation: border-shimmer 8s linear infinite;
+  }
 }
 
 .masthead {
@@ -64,13 +115,70 @@
   }
 }
 
+.themeOnSplit {
+  position: absolute;
+  top: var(--gap-md);
+  right: calc(var(--rail-width) + var(--gap-md));
+  z-index: 120;
+}
+
+.themeBarFixed {
+  position: fixed;
+  top: var(--gap-md);
+  right: var(--gap-md);
+  z-index: 110;
+}
+
+.rightColumn {
+  flex: 0 0 var(--rail-width);
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-height: 100dvh;
+  min-height: 0;
+  border-left: 1px solid var(--outline-variant);
+  background: color-mix(in srgb, var(--surface-container) 88%, transparent);
+  backdrop-filter: blur(0.75rem);
+}
+
+@media (max-width: 40rem) {
+  .pageSplit .rightColumn {
+    flex: 0 0 auto;
+    height: auto;
+    max-height: 45dvh;
+    border-left: 0;
+    border-top: 1px solid var(--outline-variant);
+  }
+}
+
+.mastheadIntake {
+  flex-shrink: 0;
+  animation: masthead-in var(--duration-slow) var(--ease-out) both;
+
+  .tagline {
+    max-width: 36rem;
+    font-size: 0.9375rem;
+  }
+
+  h1 {
+    font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+  }
+}
+
 .eyebrow {
   margin: 0;
   font-size: 0.75rem;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--primary);
   font-weight: 600;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--primary) 95%, white),
+    color-mix(in srgb, var(--tertiary) 85%, white)
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
 .tagline {
@@ -83,9 +191,12 @@
 .panel {
   padding: var(--gap-md);
   border-radius: var(--radius);
-  background: color-mix(in srgb, var(--surface-container) 70%, transparent);
-  border: 1px solid var(--outline-variant);
-  backdrop-filter: blur(0.5rem);
+  background: color-mix(in srgb, var(--surface-container) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--outline-variant) 80%, var(--tertiary));
+  backdrop-filter: blur(0.65rem);
+  box-shadow: 0 0.5rem 2rem color-mix(in srgb, var(--nebula) 18%, transparent);
+  max-width: 100%;
+  min-width: 0;
 }
 
 .result {
@@ -121,10 +232,11 @@
   align-items: center;
   gap: var(--gap-sm);
   flex-wrap: wrap;
+  font-family: Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 0.6875rem;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--primary);
+  color: color-mix(in srgb, var(--primary) 88%, var(--moon));
 }
 
 // Says which path produced the summary. Worth surfacing rather than hiding: a
@@ -148,8 +260,8 @@
   margin: 0;
   padding: var(--gap-md);
   border-radius: var(--radius-sm);
-  border-left: 3px solid var(--tertiary);
-  background: color-mix(in srgb, var(--tertiary) 9%, transparent);
+  border-left: 3px solid var(--primary);
+  background: color-mix(in srgb, var(--nebula) 22%, transparent);
   line-height: 1.7;
 }
 
@@ -184,5 +296,26 @@
   from {
     opacity: 0;
     transform: translateY(1rem);
+  }
+}
+
+@keyframes masthead-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+}
+
+@keyframes border-shimmer {
+  0% {
+    filter: hue-rotate(0deg);
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.85;
+  }
+  100% {
+    filter: hue-rotate(18deg);
+    opacity: 0.55;
   }
 }

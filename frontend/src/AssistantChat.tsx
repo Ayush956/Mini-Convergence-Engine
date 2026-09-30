@@ -30,9 +30,10 @@ interface Props {
 function suggestionsFor(reading: Reading | null): string[] {
   if (!reading) {
     return [
-      'Run a reading first, then ask me to explain it.',
       'What does N mean in the convergence section?',
       'How are trait scores decided?',
+      'What are the five systems this app runs?',
+      'What will I see after I click Run the five systems?',
     ];
   }
 
@@ -103,11 +104,6 @@ export function AssistantChat({ reading }: Props) {
       return;
     }
 
-    if (!reading) {
-      setError('Run the five systems first — the assistant answers about a reading on screen.');
-      return;
-    }
-
     setError(null);
     setInput('');
     const userMsg: Message = { id: `u-${Date.now()}`, role: 'user', content: trimmed };
@@ -158,15 +154,16 @@ export function AssistantChat({ reading }: Props) {
               <PsychologyIcon />
             </span>
           </div>
-          <h3>Ask about this reading</h3>
+          <h3>{reading ? 'Ask about this reading' : 'Ask about the engine'}</h3>
           <p>
-            Questions stay grounded in the numbers already on screen — methods, trait scores, N,
-            and confidence.
+            {reading
+              ? 'Questions stay grounded in the numbers on screen — methods, trait scores, N, and confidence.'
+              : 'General questions work now. Anything about your personal results needs a run first — enter birth details on the left and click Run the five systems.'}
           </p>
           <p className={styles.heroHint}>
             {reading
               ? `Context: ${reading.full_name}, born ${reading.date_of_birth}.`
-              : 'Run a reading first to unlock grounded answers.'}
+              : 'No reading on screen yet — I will not invent signs or scores.'}
           </p>
 
           <div className={styles.suggestions}>
@@ -178,7 +175,7 @@ export function AssistantChat({ reading }: Props) {
                   key={text}
                   type="button"
                   className={styles.suggestBtn}
-                  disabled={busy || !reading}
+                  disabled={busy}
                   onClick={() => void submit(text)}
                 >
                   <span className={styles.suggestIcon}>
@@ -237,7 +234,7 @@ export function AssistantChat({ reading }: Props) {
           placeholder={
             reading
               ? 'Ask about the scores, convergence, or one method…'
-              : 'Run a reading first…'
+              : 'Ask how the app works, or what N means…'
           }
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -249,7 +246,7 @@ export function AssistantChat({ reading }: Props) {
         <IconButton
           type="submit"
           color="primary"
-          disabled={!input.trim() || busy || !reading}
+          disabled={!input.trim() || busy}
           aria-label="Send message"
           className={styles.send}
         >
@@ -257,7 +254,9 @@ export function AssistantChat({ reading }: Props) {
         </IconButton>
       </form>
       <p className={styles.disclaimer}>
-        Answers use the same model as the summary and may misread nuance — check the matrix.
+        {reading
+          ? 'Answers use the same model as the summary — check the matrix if something looks off.'
+          : 'Without a reading I explain the app only; run the five systems for personal scores.'}
       </p>
     </div>
   );

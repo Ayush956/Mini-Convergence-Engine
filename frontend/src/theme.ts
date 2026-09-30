@@ -1,63 +1,136 @@
 import { createTheme } from '@mui/material/styles';
 
-/**
- * The colour tokens, defined once.
- *
- * MUI needs them as JavaScript, because it computes hover and focus states
- * from the base colours and cannot do that through a CSS variable. The
- * stylesheets need them as CSS. So they live here and are published to CSS as
- * custom properties at startup - one source, no drift between the two.
- *
- * Values are the Material 3 baseline dark tokens for a violet primary with an
- * orange tertiary, which is what the design was built against.
- */
-export const colours = {
-  surface: '#141218',
-  'surface-container': '#211f26',
-  'surface-container-high': '#2b2930',
-  'on-surface': '#e6e0e9',
-  'on-surface-variant': '#cac4d0',
-  'outline-variant': '#49454f',
-  primary: '#cfbcff',
-  'on-primary': '#381e72',
-  tertiary: '#ffb77c',
-  error: '#ffb4ab',
+export type ThemeMode = 'light' | 'dark';
 
-  // Trait strength, reused by the matrix bars and the confidence meters.
-  strong: '#7ee787',
-  medium: '#d9a441',
-  weak: '#6b7280',
+export type ColourTokens = {
+  surface: string;
+  'surface-container': string;
+  'surface-container-high': string;
+  'on-surface': string;
+  'on-surface-variant': string;
+  'outline-variant': string;
+  primary: string;
+  'on-primary': string;
+  tertiary: string;
+  error: string;
+  nebula: string;
+  moon: string;
+  strong: string;
+  medium: string;
+  weak: string;
+};
+
+/** Night-sky astrology palette (existing dark look). */
+export const darkColours: ColourTokens = {
+  surface: '#070a12',
+  'surface-container': '#0f1524',
+  'surface-container-high': '#171f33',
+  'on-surface': '#ede8dc',
+  'on-surface-variant': '#9aa3bc',
+  'outline-variant': '#2e3a5c',
+  primary: '#e4c76b',
+  'on-primary': '#1a1408',
+  tertiary: '#a78bfa',
+  error: '#f5a8a0',
+  nebula: '#5b3d8a',
+  moon: '#c5d0ef',
+  strong: '#6ee7d4',
+  medium: '#d4a843',
+  weak: '#5c6478',
+};
+
+/** Warm daylight / solar palette for the default light theme. */
+export const lightColours: ColourTokens = {
+  surface: '#faf6eb',
+  'surface-container': '#fff9e6',
+  'surface-container-high': '#f5ecd4',
+  'on-surface': '#2a2214',
+  'on-surface-variant': '#6b5d45',
+  'outline-variant': '#d9c9a3',
+  primary: '#b8860b',
+  'on-primary': '#fffdf5',
+  tertiary: '#c45c26',
+  error: '#c62828',
+  nebula: '#e8d4a8',
+  moon: '#8a7355',
+  strong: '#0d9488',
+  medium: '#ca8a04',
+  weak: '#78716c',
+};
+
+export const THEME_STORAGE_KEY = 'mce-theme';
+
+export function coloursForMode(mode: ThemeMode): ColourTokens {
+  return mode === 'dark' ? darkColours : lightColours;
+}
+
+export function colourVariablesFor(mode: ThemeMode): Record<string, string> {
+  const colours = coloursForMode(mode);
+  return Object.fromEntries(Object.entries(colours).map(([name, value]) => [`--${name}`, value]));
+}
+
+const sharedTypography = {
+  fontFamily: "Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif",
+  h1: {
+    fontFamily: "'Cormorant Garamond', Georgia, 'Times New Roman', serif",
+    fontWeight: 600,
+    letterSpacing: '0.02em',
+  },
+  h2: {
+    fontFamily: "'Cormorant Garamond', Georgia, 'Times New Roman', serif",
+    fontWeight: 600,
+    letterSpacing: '0.02em',
+  },
+  h3: {
+    fontFamily: "'Cormorant Garamond', Georgia, 'Times New Roman', serif",
+    fontWeight: 600,
+    letterSpacing: '0.04em',
+  },
 } as const;
 
-export const colourVariables = Object.fromEntries(
-  Object.entries(colours).map(([name, value]) => [`--${name}`, value]),
-);
+export function createAppTheme(mode: ThemeMode) {
+  const colours = coloursForMode(mode);
+  const muiMode = mode === 'dark' ? 'dark' : 'light';
 
-export const theme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: { main: colours.primary, contrastText: colours['on-primary'] },
-    secondary: { main: colours.tertiary },
-    error: { main: colours.error },
-    background: {
-      default: colours.surface,
-      paper: colours['surface-container'],
+  return createTheme({
+    palette: {
+      mode: muiMode,
+      primary: { main: colours.primary, contrastText: colours['on-primary'] },
+      secondary: { main: colours.tertiary },
+      error: { main: colours.error },
+      background: {
+        default: colours.surface,
+        paper: colours['surface-container'],
+      },
+      text: {
+        primary: colours['on-surface'],
+        secondary: colours['on-surface-variant'],
+      },
+      divider: colours['outline-variant'],
     },
-    text: {
-      primary: colours['on-surface'],
-      secondary: colours['on-surface-variant'],
+    typography: sharedTypography,
+    shape: { borderRadius: 8 },
+    components: {
+      MuiPaper: { styleOverrides: { root: { backgroundImage: 'none' } } },
+      MuiTextField: { defaultProps: { variant: 'outlined', fullWidth: true } },
+      MuiButton: { defaultProps: { disableElevation: true } },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: colours.moon,
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderColor: colours.primary,
+            },
+          },
+        },
+      },
     },
-    divider: colours['outline-variant'],
-  },
-  typography: {
-    fontFamily: "Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif",
-  },
-  shape: { borderRadius: 8 },
-  components: {
-    // The radial gradient on the body should show through the panels, so no
-    // component may paint an opaque sheet over it.
-    MuiPaper: { styleOverrides: { root: { backgroundImage: 'none' } } },
-    MuiTextField: { defaultProps: { variant: 'outlined', fullWidth: true } },
-    MuiButton: { defaultProps: { disableElevation: true } },
-  },
-});
+  });
+}
+
+/** @deprecated Use createAppTheme('dark') — kept so older imports do not break silently. */
+export const colours = darkColours;
+export const colourVariables = colourVariablesFor('dark');
+export const theme = createAppTheme('dark');
