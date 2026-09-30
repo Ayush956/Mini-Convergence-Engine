@@ -42,3 +42,48 @@ h1 {
   border: 1px solid var(--outline-variant);
   backdrop-filter: blur(0.5rem);
 }
+
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+  animation: result-in var(--duration-slow) var(--ease-out) both;
+}
+
+.result-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--gap-md);
+  flex-wrap: wrap;
+}
+
+.subject {
+  margin: var(--gap-xs) 0 0;
+  font-size: 0.875rem;
+  color: var(--on-surface-variant);
+  font-variant-numeric: tabular-nums;
+}
+
+.raw {
+  margin: 0;
+  padding-left: 1.25rem;
+  line-height: 1.8;
+}
+
+.link {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--primary);
+  cursor: pointer;
+  font: inherit;
+  text-decoration: underline;
+}
+
+@keyframes result-in {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+}
