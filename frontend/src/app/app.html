@@ -39,6 +39,14 @@
         />
       </section>
 
+      <section class="block">
+        <h3 class="block-title">Where the systems converge</h3>
+        <app-convergence
+          [methods]="result.methods"
+          [traits]="result.traits"
+        />
+      </section>
+
       <p class="summary">{{ result.summary }}</p>
 
       @if (result.assumptions.length) {

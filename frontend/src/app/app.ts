@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 
 import { BirthForm } from './birth-form/birth-form';
+import { Convergence } from './convergence/convergence';
 import { MethodCards } from './method-cards/method-cards';
 import { Reading, ReadingRequest } from './reading.models';
 import { ReadingService } from './reading.service';
@@ -9,7 +10,7 @@ import { ScoreMatrix } from './score-matrix/score-matrix';
 @Component({
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [BirthForm, MethodCards, ScoreMatrix],
+  imports: [BirthForm, Convergence, MethodCards, ScoreMatrix],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

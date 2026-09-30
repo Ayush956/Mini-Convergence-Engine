@@ -1,0 +1,62 @@
+@if (strongest(); as top) {
+  <p class="headline">
+    @if (top.n === 0) {
+      No trait reached the agreement threshold on any method.
+    } @else {
+      Strongest agreement on
+      <strong>{{ top.traits.join(', ') }}</strong>
+      &mdash; {{ top.n }} of {{ methodCount }} methods, giving
+      <strong><span [appCountUp]="top.percent" [decimals]="1" suffix="%"></span></strong>
+      confidence.
+    }
+  </p>
+}
+
+<ul class="rows">
+  @for (row of rows(); track row.trait; let i = $index) {
+    <li class="row" [style.--delay.ms]="i * 70">
+      <div class="label">
+        <span class="trait">{{ row.trait }}</span>
+        <span class="pips" [attr.aria-label]="row.n + ' of ' + methodCount + ' methods agree'">
+          @for (filled of row.pips; track $index) {
+            <span class="pip" [class.on]="filled"></span>
+          }
+        </span>
+      </div>
+
+      <div class="meter" role="presentation">
+        <span
+          class="meter-fill"
+          [style.--fill.%]="row.percent"
+          [style.--delay.ms]="i * 70 + 120"
+          [class.none]="row.n === 0"
+        ></span>
+      </div>
+
+      <p class="figure">
+        <span
+          class="percent"
+          [appCountUp]="row.percent"
+          [decimals]="1"
+          suffix="%"
+          [delay]="i * 70 + 120"
+        ></span>
+        <span class="n">N = {{ row.n }}</span>
+      </p>
+
+      <p class="who">
+        @if (row.agreeing.length) {
+          Agreeing: {{ row.agreeing.join(', ') }}
+        } @else {
+          Nothing scored this {{ threshold }} or above
+        }
+      </p>
+    </li>
+  }
+</ul>
+
+<p class="formula">
+  Confidence is the brief's formula, 1 &minus; 1/2<sup>N</sup>, where N counts
+  the methods scoring that trait 7 or above. It rises 0, 50, 75, 87.5, 93.75,
+  96.875 per cent as N goes 0 to 5.
+</p>
