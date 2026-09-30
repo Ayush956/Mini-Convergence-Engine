@@ -5,14 +5,30 @@ import { BirthForm } from './BirthForm';
 import { Convergence } from './Convergence';
 import { MethodCards } from './MethodCards';
 import { ScoreMatrix } from './ScoreMatrix';
+import { Skeleton } from './Skeleton';
 import { getReading } from './reading.api';
 import type { ApiError, Reading, ReadingRequest } from './reading.models';
+
+/**
+ * How long a wait may run before we explain it. A warm backend answers in
+ * well under a second; anything past this is an instance waking from idle,
+ * and silence there reads as a hang.
+ */
+const SLOW_AFTER_MS = 6000;
 
 export function App() {
   const [reading, setReading] = useState<Reading | null>(null);
   const [busy, setBusy] = useState(false);
+  const [slow, setSlow] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const resultPanel = useRef<HTMLElement | null>(null);
+  const slowTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  const settle = () => {
+    clearTimeout(slowTimer.current);
+    setBusy(false);
+    setSlow(false);
+  };
 
   const run = useCallback(async (request: ReadingRequest) => {
     setBusy(true);
@@ -20,13 +36,16 @@ export function App() {
     // Cleared so the new request replaces the old reading rather than sitting
     // underneath it, which would leave two answers on screen at once.
     setReading(null);
+    setSlow(false);
+    clearTimeout(slowTimer.current);
+    slowTimer.current = setTimeout(() => setSlow(true), SLOW_AFTER_MS);
 
     try {
       setReading(await getReading(request));
     } catch (failure) {
       setError((failure as ApiError).message);
     } finally {
-      setBusy(false);
+      settle();
     }
   }, []);
 
@@ -37,6 +56,8 @@ export function App() {
       resultPanel.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [reading]);
+
+  useEffect(() => () => clearTimeout(slowTimer.current), []);
 
   return (
     <main className={styles.shell}>
@@ -53,6 +74,12 @@ export function App() {
         <BirthForm busy={busy} serverError={error} onSubmit={run} />
       </section>
 
+      {busy && (
+        <section className={styles.panel}>
+          <Skeleton slow={slow} />
+        </section>
+      )}
+
       {reading && (
         <section className={`${styles.panel} ${styles.result}`} ref={resultPanel}>
           <header className={styles.resultHead}>
@@ -62,7 +89,14 @@ export function App() {
                 Born {reading.date_of_birth} at {reading.time_of_birth}
               </p>
             </div>
-            <button type="button" className={styles.link} onClick={() => setReading(null)}>
+            <button
+              type="button"
+              className={styles.link}
+              onClick={() => {
+                setReading(null);
+                setError(null);
+              }}
+            >
               Start over
             </button>
           </header>
