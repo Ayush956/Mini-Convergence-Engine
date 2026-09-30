@@ -3,15 +3,23 @@
 import os
 from typing import List
 
+from dotenv import load_dotenv
+
+# Load backend/.env before anything reads OPENROUTER_API_KEY. Without this,
+# uvicorn only sees variables exported in the shell, and the summary silently
+# falls back to the template even when a key file is present.
+load_dotenv()
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.requests import Request
 
+from app.engine.chat import chat as run_chat
 from app.engine.reading import ReadingError, build_reading
 from app.engine.summary import summarise
-from app.models import ReadingRequest, ReadingResponse
+from app.models import ChatRequest, ChatResponse, ReadingRequest, ReadingResponse
 
 app = FastAPI(
     title="Mini Convergence Engine",
@@ -27,7 +35,7 @@ def _allowed_origins() -> List[str]:
     """Origins permitted to call this API.
 
     The deployed frontend origin is injected via FRONTEND_ORIGIN so the
-    deployment URL never has to be committed. Local Angular dev servers are
+    deployment URL never has to be committed. Local Vite dev servers are
     always allowed because they are harmless and save a config step.
     """
     local = ["http://localhost:4200", "http://127.0.0.1:4200"]
@@ -99,3 +107,18 @@ def reading(request: ReadingRequest) -> ReadingResponse:
         summary_source=source,
         assumptions=assumptions,
     )
+
+
+@app.post("/api/chat", response_model=ChatResponse)
+def chat_with_reading(request: ChatRequest) -> ChatResponse:
+    """Answer questions grounded in one completed reading."""
+    reading = request.reading.model_dump(mode="json")
+    history = [turn.model_dump() for turn in request.history]
+
+    reply, source = run_chat(
+        user_message=request.message,
+        reading=reading,
+        history=history,
+    )
+
+    return ChatResponse(reply=reply, source=source)

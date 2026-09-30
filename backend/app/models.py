@@ -96,6 +96,34 @@ class ReadingResponse(BaseModel):
     assumptions: List[str]
 
 
+class ChatTurn(BaseModel):
+    role: str
+    content: str
+
+
+class ChatRequest(BaseModel):
+    """User question plus the reading it must stay grounded in."""
+
+    message: str
+    reading: ReadingResponse
+    history: List[ChatTurn] = []
+
+    @field_validator("message")
+    @classmethod
+    def message_must_not_be_empty(cls, value: str) -> str:
+        trimmed = value.strip()
+        if not trimmed:
+            raise ValueError("Please enter a question.")
+        if len(trimmed) > 800:
+            raise ValueError("That question is a little too long for us.")
+        return trimmed
+
+
+class ChatResponse(BaseModel):
+    reply: str
+    source: str = Field(..., description="Either 'model' or 'unavailable'.")
+
+
 class ErrorResponse(BaseModel):
     """A validation or calculation failure, phrased for a human."""
 
