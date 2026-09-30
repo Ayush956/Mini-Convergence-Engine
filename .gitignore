@@ -7,6 +7,7 @@ secrets.json
 
 # The assignment brief contains the API key in plain text
 *.pdf
+*.pages
 
 # Python
 __pycache__/
