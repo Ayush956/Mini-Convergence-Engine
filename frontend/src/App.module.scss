@@ -1,10 +1,41 @@
-.shell {
-  max-width: 62rem;
-  margin: 0 auto;
-  padding: var(--gap-xl) var(--gap-md);
+.page {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  min-height: 100vh;
+  gap: 0;
+}
+
+.pageCentered {
+  flex-direction: column;
+  justify-content: flex-start;
+
+  .main {
+    max-width: 62rem;
+    width: 100%;
+    margin-inline: auto;
+  }
+}
+
+.pageSplit {
+  .main {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
+  }
+}
+
+@media (max-width: 40rem) {
+  .pageSplit {
+    flex-direction: column;
+  }
+}
+
+.main {
   display: flex;
   flex-direction: column;
   gap: var(--gap-lg);
+  padding: var(--gap-xl) var(--gap-md);
 }
 
 .masthead {

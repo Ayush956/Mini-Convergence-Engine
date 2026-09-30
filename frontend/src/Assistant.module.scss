@@ -1,8 +1,19 @@
-.fab {
+.rail {
+  flex: 0 0 min(26rem, 36vw);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  border-left: 1px solid var(--outline-variant);
+  background: color-mix(in srgb, var(--surface-container) 88%, transparent);
+  backdrop-filter: blur(0.75rem);
+  animation: rail-in var(--duration-slow) var(--ease-out) both;
+}
+
+.reopen {
   position: fixed;
   right: var(--gap-md);
   bottom: var(--gap-md);
-  z-index: 1200;
+  z-index: 100;
   display: inline-flex;
   align-items: center;
   gap: var(--gap-xs);
@@ -26,44 +37,12 @@
     transform var(--duration-fast) var(--ease-out),
     box-shadow var(--duration-fast) var(--ease-out);
 
-  svg {
-    font-size: 1.125rem;
-  }
-
   &:hover {
     transform: translateY(-2px);
     box-shadow:
       0 0.75rem 2rem color-mix(in srgb, var(--primary) 45%, transparent),
       0 0 0 1px color-mix(in srgb, var(--primary) 55%, transparent);
   }
-}
-
-.backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1290;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-  background: color-mix(in srgb, black 45%, transparent);
-  backdrop-filter: blur(2px);
-  animation: fade-in var(--duration) var(--ease-out) both;
-}
-
-.panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  z-index: 1300;
-  display: flex;
-  flex-direction: column;
-  width: min(100vw, 26rem);
-  height: 100%;
-  border-left: 1px solid var(--outline-variant);
-  background: color-mix(in srgb, var(--surface-container) 92%, transparent);
-  backdrop-filter: blur(0.75rem);
-  box-shadow: -0.5rem 0 2rem color-mix(in srgb, black 35%, transparent);
-  animation: slide-in var(--duration-slow) var(--ease-out) both;
 }
 
 .panelHead {
@@ -469,32 +448,36 @@
   line-height: 1.5;
 }
 
-@keyframes fade-in {
+@keyframes rail-in {
   from {
     opacity: 0;
+    transform: translateX(0.75rem);
   }
 }
 
-@keyframes slide-in {
-  from {
-    transform: translateX(100%);
+@media (max-width: 56rem) {
+  .rail {
+    flex: 0 0 min(22rem, 42vw);
   }
 }
 
-@media (max-width: 28rem) {
-  .fab span {
+@media (max-width: 40rem) {
+  .rail {
+    flex: 0 0 100%;
+    min-height: 50vh;
+    border-left: 0;
+    border-top: 1px solid var(--outline-variant);
+  }
+
+  .reopen span {
     display: none;
   }
 
-  .fab {
+  .reopen {
     width: 3.25rem;
     height: 3.25rem;
     padding: 0;
     justify-content: center;
     border-radius: 999px;
-  }
-
-  .panel {
-    width: 100%;
   }
 }

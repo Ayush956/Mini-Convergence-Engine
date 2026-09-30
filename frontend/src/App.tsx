@@ -22,6 +22,7 @@ export function App() {
   const [busy, setBusy] = useState(false);
   const [slow, setSlow] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [assistantOpen, setAssistantOpen] = useState(true);
   const resultPanel = useRef<HTMLElement | null>(null);
   const slowTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -60,89 +61,99 @@ export function App() {
 
   useEffect(() => () => clearTimeout(slowTimer.current), []);
 
+  const pageClass = assistantOpen ? styles.pageSplit : styles.pageCentered;
+
   return (
-    <main className={styles.shell}>
-      <header className={styles.masthead}>
-        <p className={styles.eyebrow}>Mini Convergence Engine</p>
-        <h1>Five systems, one birth record.</h1>
-        <p className={styles.tagline}>
-          A sun sign, a Chinese animal, two numerology numbers and a Vedic weekday are calculated
-          independently, scored against six traits, and measured for where they agree.
-        </p>
-      </header>
+    <div className={`${styles.page} ${pageClass}`}>
+      <main className={styles.main}>
+        <header className={styles.masthead}>
+          <p className={styles.eyebrow}>Mini Convergence Engine</p>
+          <h1>Five systems, one birth record.</h1>
+          <p className={styles.tagline}>
+            A sun sign, a Chinese animal, two numerology numbers and a Vedic weekday are
+            calculated independently, scored against six traits, and measured for where they
+            agree.
+          </p>
+        </header>
 
-      <section className={styles.panel}>
-        <BirthForm busy={busy} serverError={error} onSubmit={run} />
-      </section>
-
-      {busy && (
         <section className={styles.panel}>
-          <Skeleton slow={slow} />
+          <BirthForm busy={busy} serverError={error} onSubmit={run} />
         </section>
-      )}
 
-      {reading && (
-        <section className={`${styles.panel} ${styles.result}`} ref={resultPanel}>
-          <header className={styles.resultHead}>
-            <div>
-              <h2>{reading.full_name}</h2>
-              <p className={styles.subject}>
-                Born {reading.date_of_birth} at {reading.time_of_birth}
-              </p>
-            </div>
-            <button
-              type="button"
-              className={styles.link}
-              onClick={() => {
-                setReading(null);
-                setError(null);
-              }}
-            >
-              Start over
-            </button>
-          </header>
-
-          <MethodCards methods={reading.methods} />
-
-          <section className={styles.block}>
-            <h3 className={styles.blockTitle}>The score matrix</h3>
-            <ScoreMatrix methods={reading.methods} traits={reading.traits} />
+        {busy && (
+          <section className={styles.panel}>
+            <Skeleton slow={slow} />
           </section>
+        )}
 
-          <section className={styles.block}>
-            <h3 className={styles.blockTitle}>Where the systems converge</h3>
-            <Convergence methods={reading.methods} traits={reading.traits} />
-          </section>
-
-          <section className={styles.block}>
-            <h3 className={styles.blockTitle}>
-              In plain language
-              <span
-                className={`${styles.source} ${
-                  reading.summary_source === 'template' ? styles.fromTemplate : ''
-                }`}
+        {reading && (
+          <section className={`${styles.panel} ${styles.result}`} ref={resultPanel}>
+            <header className={styles.resultHead}>
+              <div>
+                <h2>{reading.full_name}</h2>
+                <p className={styles.subject}>
+                  Born {reading.date_of_birth} at {reading.time_of_birth}
+                </p>
+              </div>
+              <button
+                type="button"
+                className={styles.link}
+                onClick={() => {
+                  setReading(null);
+                  setError(null);
+                }}
               >
-                {reading.summary_source === 'model'
-                  ? 'written by the model'
-                  : 'model unavailable, written from the template'}
-              </span>
-            </h3>
-            <p className={styles.summary}>{reading.summary}</p>
-          </section>
+                Start over
+              </button>
+            </header>
 
-          {reading.assumptions.length > 0 && (
-            <aside className={styles.assumptions}>
-              <h3>Assumptions applied to this reading</h3>
-              <ul>
-                {reading.assumptions.map((assumption) => (
-                  <li key={assumption}>{assumption}</li>
-                ))}
-              </ul>
-            </aside>
-          )}
-        </section>
-      )}
-      <ReadingAssistant reading={reading} />
-    </main>
+            <MethodCards methods={reading.methods} />
+
+            <section className={styles.block}>
+              <h3 className={styles.blockTitle}>The score matrix</h3>
+              <ScoreMatrix methods={reading.methods} traits={reading.traits} />
+            </section>
+
+            <section className={styles.block}>
+              <h3 className={styles.blockTitle}>Where the systems converge</h3>
+              <Convergence methods={reading.methods} traits={reading.traits} />
+            </section>
+
+            <section className={styles.block}>
+              <h3 className={styles.blockTitle}>
+                In plain language
+                <span
+                  className={`${styles.source} ${
+                    reading.summary_source === 'template' ? styles.fromTemplate : ''
+                  }`}
+                >
+                  {reading.summary_source === 'model'
+                    ? 'written by the model'
+                    : 'model unavailable, written from the template'}
+                </span>
+              </h3>
+              <p className={styles.summary}>{reading.summary}</p>
+            </section>
+
+            {reading.assumptions.length > 0 && (
+              <aside className={styles.assumptions}>
+                <h3>Assumptions applied to this reading</h3>
+                <ul>
+                  {reading.assumptions.map((assumption) => (
+                    <li key={assumption}>{assumption}</li>
+                  ))}
+                </ul>
+              </aside>
+            )}
+          </section>
+        )}
+      </main>
+
+      <ReadingAssistant
+        reading={reading}
+        open={assistantOpen}
+        onOpenChange={setAssistantOpen}
+      />
+    </div>
   );
 }
