@@ -112,7 +112,9 @@ def reading(request: ReadingRequest) -> ReadingResponse:
 @app.post("/api/chat", response_model=ChatResponse)
 def chat_with_reading(request: ChatRequest) -> ChatResponse:
     """Answer questions grounded in one completed reading."""
-    reading = request.reading.model_dump(mode="json")
+    reading = (
+        request.reading.model_dump(mode="json") if request.reading is not None else None
+    )
     history = [turn.model_dump() for turn in request.history]
 
     reply, source = run_chat(

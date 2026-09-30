@@ -32,6 +32,15 @@ def test_chat_without_a_key_returns_unavailable_not_500():
     assert isinstance(payload["reply"], str) and payload["reply"]
 
 
+def test_chat_without_a_reading_is_accepted():
+    response = client.post(
+        "/api/chat",
+        json={"message": "What does N mean?", "reading": None, "history": []},
+    )
+    assert response.status_code == 200
+    assert isinstance(response.json()["reply"], str)
+
+
 def test_empty_question_is_rejected():
     body = _reading_body()
     response = client.post(

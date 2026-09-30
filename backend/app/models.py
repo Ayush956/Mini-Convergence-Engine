@@ -102,10 +102,10 @@ class ChatTurn(BaseModel):
 
 
 class ChatRequest(BaseModel):
-    """User question plus the reading it must stay grounded in."""
+    """User question; reading is omitted until the five systems have been run."""
 
     message: str
-    reading: ReadingResponse
+    reading: Optional[ReadingResponse] = None
     history: List[ChatTurn] = []
 
     @field_validator("message")
