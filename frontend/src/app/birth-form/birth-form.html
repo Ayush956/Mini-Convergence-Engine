@@ -1,0 +1,85 @@
+<form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <mat-form-field appearance="outline">
+    <mat-label>Full name</mat-label>
+    <input
+      matInput
+      formControlName="fullName"
+      autocomplete="name"
+      placeholder="e.g. Ayush Mishra"
+      [attr.aria-describedby]="'name-hint'"
+    />
+    <mat-icon matSuffix>person_outline</mat-icon>
+    @if (errorFor('fullName'); as message) {
+      <mat-error>{{ message }}</mat-error>
+    } @else {
+      <mat-hint id="name-hint">Used for the Chaldean name number</mat-hint>
+    }
+  </mat-form-field>
+
+  <div class="row">
+    <mat-form-field appearance="outline">
+      <mat-label>Date of birth</mat-label>
+      <input
+        matInput
+        formControlName="dateOfBirth"
+        [matDatepicker]="picker"
+        [min]="minDate"
+        [max]="maxDate"
+        placeholder="DD/MM/YYYY"
+      />
+      <mat-datepicker-toggle matIconSuffix [for]="picker" />
+      <mat-datepicker #picker startView="multi-year" />
+      @if (errorFor('dateOfBirth'); as message) {
+        <mat-error>{{ message }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Time of birth</mat-label>
+      <input
+        matInput
+        formControlName="timeOfBirth"
+        type="time"
+        step="60"
+        placeholder="HH:MM"
+      />
+      <mat-icon matSuffix>schedule</mat-icon>
+      @if (errorFor('timeOfBirth'); as message) {
+        <mat-error>{{ message }}</mat-error>
+      } @else {
+        <mat-hint>Assumed to be IST</mat-hint>
+      }
+    </mat-form-field>
+  </div>
+
+  @if (serverError()) {
+    <p class="server-error" role="alert">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ serverError() }}</span>
+    </p>
+  }
+
+  <div class="actions">
+    <!--
+      Two buttons rather than one with @if inside. Material projects mat-icon
+      into a named slot, and a control-flow block with more than one root node
+      defeats that projection (NG8011), so the icon would land in the wrong
+      place.
+    -->
+    @if (busy()) {
+      <button matButton="filled" type="submit" class="submit" disabled>
+        <mat-spinner diameter="18" />
+        Calculating
+      </button>
+    } @else {
+      <button matButton="filled" type="submit" class="submit">
+        <mat-icon>auto_awesome</mat-icon>
+        Run the five systems
+      </button>
+    }
+
+    @if (blockedReason; as reason) {
+      <span class="blocked">{{ reason }}</span>
+    }
+  </div>
+</form>

@@ -1,7 +1,34 @@
 <main class="shell">
-  <h1>Mini Convergence Engine</h1>
-  <p class="tagline">
-    Five divination systems, one birth record, and a measure of where they agree.
-  </p>
-  <p class="placeholder">Form and results to follow.</p>
+  <header class="masthead">
+    <p class="eyebrow">Mini Convergence Engine</p>
+    <h1>Five systems, one birth record.</h1>
+    <p class="tagline">
+      A sun sign, a Chinese animal, two numerology numbers and a Vedic weekday
+      are calculated independently, scored against six traits, and measured for
+      where they agree.
+    </p>
+  </header>
+
+  <section class="panel">
+    <app-birth-form
+      [busy]="busy()"
+      [serverError]="error()"
+      (submitted)="run($event)"
+    />
+  </section>
+
+  @if (reading(); as result) {
+    <section class="panel">
+      <h2>{{ result.full_name }}</h2>
+      <ul class="raw">
+        @for (method of result.methods; track method.id) {
+          <li><strong>{{ method.label }}:</strong> {{ method.result }}</li>
+        }
+      </ul>
+      <p class="summary">{{ result.summary }}</p>
+      <button type="button" class="link" (click)="reset()">
+        Start over
+      </button>
+    </section>
+  }
 </main>

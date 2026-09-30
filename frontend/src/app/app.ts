@@ -1,11 +1,41 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+
+import { BirthForm } from './birth-form/birth-form';
+import { Reading, ReadingRequest } from './reading.models';
+import { ReadingService } from './reading.service';
 
 @Component({
   selector: 'app-root',
-  imports: [],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [BirthForm],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
 })
 export class App {
-  protected readonly apiBase = '';
+  private readonly service = inject(ReadingService);
+
+  readonly reading = signal<Reading | null>(null);
+  readonly busy = signal(false);
+  readonly error = signal<string | null>(null);
+
+  run(request: ReadingRequest): void {
+    this.busy.set(true);
+    this.error.set(null);
+
+    this.service.getReading(request).subscribe({
+      next: (reading) => {
+        this.reading.set(reading);
+        this.busy.set(false);
+      },
+      error: (failure: { message: string }) => {
+        this.error.set(failure.message);
+        this.busy.set(false);
+      },
+    });
+  }
+
+  reset(): void {
+    this.reading.set(null);
+    this.error.set(null);
+  }
 }
