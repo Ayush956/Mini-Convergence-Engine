@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 
 import { BirthForm } from './birth-form/birth-form';
+import { MethodCards } from './method-cards/method-cards';
 import { Reading, ReadingRequest } from './reading.models';
 import { ReadingService } from './reading.service';
 
 @Component({
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [BirthForm],
+  imports: [BirthForm, MethodCards],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

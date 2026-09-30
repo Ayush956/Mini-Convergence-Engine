@@ -43,15 +43,59 @@ h1 {
   backdrop-filter: blur(0.5rem);
 }
 
-.raw {
-  margin: var(--gap-sm) 0;
-  padding-left: 1.25rem;
-  line-height: 1.8;
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+  animation: result-in var(--duration-slow) var(--ease-out) both;
+}
+
+.result-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--gap-md);
+  flex-wrap: wrap;
+}
+
+.subject {
+  margin: var(--gap-xs) 0 0;
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-variant-numeric: tabular-nums;
 }
 
 .summary {
+  margin: 0;
+  padding: var(--gap-md);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--mat-sys-tertiary);
+  background: color-mix(in srgb, var(--mat-sys-tertiary) 9%, transparent);
   line-height: 1.7;
+}
+
+.assumptions {
+  font-size: 0.8125rem;
   color: var(--mat-sys-on-surface-variant);
+
+  h3 {
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  ul {
+    margin: var(--gap-xs) 0 0;
+    padding-left: 1.125rem;
+    line-height: 1.6;
+  }
+}
+
+@keyframes result-in {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
 }
 
 .link {
