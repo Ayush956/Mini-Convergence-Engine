@@ -43,3 +43,6 @@ export interface ApiError {
 
 /** The brief's agreement threshold, needed to highlight it in the matrix. */
 export const AGREEMENT_THRESHOLD = 7;
+
+/** The brief's scoring range is 0-10; the bars are drawn against it. */
+export const MAX_SCORE = 10;

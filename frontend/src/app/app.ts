@@ -4,11 +4,12 @@ import { BirthForm } from './birth-form/birth-form';
 import { MethodCards } from './method-cards/method-cards';
 import { Reading, ReadingRequest } from './reading.models';
 import { ReadingService } from './reading.service';
+import { ScoreMatrix } from './score-matrix/score-matrix';
 
 @Component({
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [BirthForm, MethodCards],
+  imports: [BirthForm, MethodCards, ScoreMatrix],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
