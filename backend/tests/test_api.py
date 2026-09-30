@@ -5,12 +5,14 @@ path. That is deliberate: the suite must not depend on a network call or burn
 credit from a capped key.
 """
 
+from datetime import date, timedelta
+
 from fastapi.testclient import TestClient
 
 from app.engine.summary import SOURCE_TEMPLATE
 from app.engine.traits import TRAITS
 from app.main import app
-from app.models import EARLIEST_YEAR, LATEST_YEAR
+from app.models import EARLIEST_YEAR
 
 client = TestClient(app)
 
@@ -212,10 +214,20 @@ def test_date_before_the_supported_range_is_rejected_clearly():
     assert body["field"] == "date_of_birth"
 
 
-def test_date_after_the_supported_range_is_rejected_clearly():
-    response = post(date_of_birth="2200-01-01")
+def test_future_date_of_birth_is_rejected_clearly():
+    tomorrow = date.today() + timedelta(days=1)
+    response = post(date_of_birth=tomorrow.isoformat())
     assert response.status_code == 422
-    assert str(LATEST_YEAR) in response.json()["message"]
+
+    body = response.json()
+    assert "future" in body["message"]
+    assert body["field"] == "date_of_birth"
+
+
+def test_far_future_date_is_rejected_as_future_not_as_out_of_range():
+    """2200 is both in the future and past the calendar table. The future
+    message is the useful one, so it has to win."""
+    assert "future" in post(date_of_birth="2200-01-01").json()["message"]
 
 
 def test_malformed_date_is_rejected_without_a_stack_trace():
@@ -252,9 +264,10 @@ def test_error_shape_is_always_message_and_field():
         assert isinstance(payload["message"], str) and payload["message"]
 
 
-def test_boundary_years_of_the_supported_range_work():
+def test_both_ends_of_the_usable_range_work():
+    """The first year we have calendar data for, and today."""
     assert post(date_of_birth="{}-06-15".format(EARLIEST_YEAR)).status_code == 200
-    assert post(date_of_birth="{}-06-15".format(LATEST_YEAR)).status_code == 200
+    assert post(date_of_birth=date.today().isoformat()).status_code == 200
 
 
 def test_health_still_works():

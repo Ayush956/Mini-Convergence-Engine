@@ -9,10 +9,11 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
-# The HKO-derived Chinese New Year table bounds what we can answer for.
-# 1902 rather than 1901 because a January 1901 birth would need 1900 data.
+# The HKO-derived Chinese New Year table starts here. 1902 rather than 1901
+# because a January 1901 birth would need 1900 data. The table runs to 2100,
+# but that ceiling is unreachable: the real upper bound is today, since nobody
+# has been born tomorrow.
 EARLIEST_YEAR = 1902
-LATEST_YEAR = 2100
 
 MAX_NAME_LENGTH = 120
 
@@ -42,12 +43,16 @@ class ReadingRequest(BaseModel):
 
     @field_validator("date_of_birth")
     @classmethod
-    def date_must_be_in_supported_range(cls, value: date) -> date:
-        if value.year < EARLIEST_YEAR or value.year > LATEST_YEAR:
+    def date_must_be_a_real_birth_date(cls, value: date) -> date:
+        # Checked before the data range because it is by far the likelier
+        # mistake, and "in the future" explains itself better than a range.
+        if value > date.today():
+            raise ValueError("A date of birth cannot be in the future.")
+        if value.year < EARLIEST_YEAR:
             raise ValueError(
-                "We can only calculate for births between {} and {}, because "
-                "that is the range of the Chinese calendar data we "
-                "verified.".format(EARLIEST_YEAR, LATEST_YEAR)
+                "We can only calculate for births from {} onwards, because "
+                "that is where the Chinese calendar data we verified "
+                "starts.".format(EARLIEST_YEAR)
             )
         return value
 
