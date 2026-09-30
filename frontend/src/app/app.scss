@@ -72,10 +72,31 @@ h1 {
 }
 
 .block-title {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  flex-wrap: wrap;
   font-size: 0.6875rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--mat-sys-primary);
+}
+
+// Says which path produced the summary. Worth surfacing rather than hiding:
+// a fallback that looks identical to a real answer is a trap for whoever
+// reviews this.
+.source {
+  padding: 0.1875rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  background: color-mix(in srgb, var(--mat-sys-primary) 16%, transparent);
+  color: var(--mat-sys-on-surface-variant);
+
+  &.template {
+    background: color-mix(in srgb, var(--medium) 18%, transparent);
+  }
 }
 
 .summary {

@@ -17,8 +17,14 @@
     />
   </section>
 
+  @if (busy()) {
+    <section class="panel">
+      <app-skeleton [slow]="slow()" />
+    </section>
+  }
+
   @if (reading(); as result) {
-    <section class="panel result">
+    <section class="panel result" #resultPanel>
       <header class="result-head">
         <div>
           <h2>{{ result.full_name }}</h2>
@@ -47,7 +53,19 @@
         />
       </section>
 
-      <p class="summary">{{ result.summary }}</p>
+      <section class="block">
+        <h3 class="block-title">
+          In plain language
+          <span class="source" [class.template]="result.summary_source === 'template'">
+            @if (result.summary_source === 'model') {
+              written by the model
+            } @else {
+              model unavailable, written from the template
+            }
+          </span>
+        </h3>
+        <p class="summary">{{ result.summary }}</p>
+      </section>
 
       @if (result.assumptions.length) {
         <aside class="assumptions">
