@@ -5,6 +5,7 @@ import { BirthForm } from './BirthForm';
 import { Convergence } from './Convergence';
 import { MethodCards } from './MethodCards';
 import { ScoreMatrix } from './ScoreMatrix';
+import { ReadingAssistant } from './ReadingAssistant';
 import { Skeleton } from './Skeleton';
 import { getReading } from './reading.api';
 import type { ApiError, Reading, ReadingRequest } from './reading.models';
@@ -141,6 +142,7 @@ export function App() {
           )}
         </section>
       )}
+      <ReadingAssistant reading={reading} />
     </main>
   );
 }
