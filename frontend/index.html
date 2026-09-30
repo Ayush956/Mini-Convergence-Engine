@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mini Convergence Engine</title>
+    <meta
+      name="description"
+      content="Five divination systems calculated from one birth record, scored against six traits, and measured for where they agree."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <!--
+      The colour tokens arrive with the JavaScript, so this one literal keeps
+      the first paint dark instead of flashing white. It is the only colour
+      outside theme.ts.
+    -->
+    <style>
+      body {
+        background-color: #141218;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

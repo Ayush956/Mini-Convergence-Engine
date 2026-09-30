@@ -1,0 +1,44 @@
+.shell {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: var(--gap-xl) var(--gap-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-lg);
+}
+
+.masthead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  max-width: 46rem;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+h1 {
+  font-size: clamp(1.75rem, 5vw, 2.75rem);
+  line-height: 1.1;
+}
+
+.tagline {
+  margin: 0;
+  color: var(--on-surface-variant);
+  line-height: 1.6;
+  max-width: 40rem;
+}
+
+.panel {
+  padding: var(--gap-md);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--surface-container) 70%, transparent);
+  border: 1px solid var(--outline-variant);
+  backdrop-filter: blur(0.5rem);
+}
