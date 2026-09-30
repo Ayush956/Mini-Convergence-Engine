@@ -2,7 +2,10 @@
   flex: 0 0 min(26rem, 36vw);
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100%;
+  max-height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
   border-left: 1px solid var(--outline-variant);
   background: color-mix(in srgb, var(--surface-container) 88%, transparent);
   backdrop-filter: blur(0.75rem);
@@ -46,6 +49,7 @@
 }
 
 .panelHead {
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -463,8 +467,9 @@
 
 @media (max-width: 40rem) {
   .rail {
-    flex: 0 0 100%;
-    min-height: 50vh;
+    flex: 1 1 45%;
+    width: 100%;
+    max-height: none;
     border-left: 0;
     border-top: 1px solid var(--outline-variant);
   }

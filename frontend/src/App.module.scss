@@ -2,13 +2,13 @@
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  min-height: 100vh;
   gap: 0;
 }
 
 .pageCentered {
   flex-direction: column;
   justify-content: flex-start;
+  min-height: 100dvh;
 
   .main {
     max-width: 62rem;
@@ -17,17 +17,31 @@
   }
 }
 
+// Viewport-high shell: the reading scrolls on the left; the assistant stays
+// one screen tall and scrolls inside its own message list.
 .pageSplit {
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+
   .main {
     flex: 1 1 auto;
     min-width: 0;
+    min-height: 0;
     max-width: none;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 }
 
 @media (max-width: 40rem) {
   .pageSplit {
     flex-direction: column;
+
+    .main {
+      flex: 1 1 55%;
+    }
   }
 }
 
