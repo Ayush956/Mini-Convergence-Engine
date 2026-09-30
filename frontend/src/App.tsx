@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import styles from './App.module.scss';
 import { BirthForm } from './BirthForm';
+import { Convergence } from './Convergence';
 import { MethodCards } from './MethodCards';
 import { ScoreMatrix } from './ScoreMatrix';
 import { getReading } from './reading.api';
@@ -71,6 +72,11 @@ export function App() {
           <section className={styles.block}>
             <h3 className={styles.blockTitle}>The score matrix</h3>
             <ScoreMatrix methods={reading.methods} traits={reading.traits} />
+          </section>
+
+          <section className={styles.block}>
+            <h3 className={styles.blockTitle}>Where the systems converge</h3>
+            <Convergence methods={reading.methods} traits={reading.traits} />
           </section>
 
           <section className={styles.block}>
