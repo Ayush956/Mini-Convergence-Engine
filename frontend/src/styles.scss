@@ -50,7 +50,7 @@ body {
     color var(--duration) var(--ease-out);
 }
 
-// --- Light theme: warm solar / parchment sky (default) ---
+// --- Light theme: parchment sky; the spinning wheel lives in App (.chakra) ---
 html[data-theme='light'] body::before {
   content: '';
   position: fixed;
@@ -77,10 +77,21 @@ html[data-theme='light'] body::before {
 }
 
 html[data-theme='light'] body::after {
-  content: none;
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.45;
+  background-image:
+    radial-gradient(1.5px 1.5px at 14% 22%, color-mix(in srgb, var(--primary) 55%, transparent), transparent),
+    radial-gradient(1px 1px at 78% 16%, color-mix(in srgb, var(--tertiary) 40%, transparent), transparent),
+    radial-gradient(1.5px 1.5px at 88% 48%, color-mix(in srgb, var(--primary) 45%, transparent), transparent),
+    radial-gradient(1px 1px at 18% 68%, color-mix(in srgb, var(--tertiary) 35%, transparent), transparent),
+    radial-gradient(1px 1px at 62% 82%, color-mix(in srgb, var(--primary) 40%, transparent), transparent);
 }
 
-// --- Dark theme: nebula night sky + stars ---
+// --- Dark theme: near-black field like the reference calculator ---
 html[data-theme='dark'] body::before {
   content: '';
   position: fixed;
@@ -89,21 +100,11 @@ html[data-theme='dark'] body::before {
   pointer-events: none;
   background:
     radial-gradient(
-      ellipse 90% 65% at 50% -15%,
-      color-mix(in srgb, var(--nebula) 38%, transparent),
-      transparent 62%
+      ellipse 70% 50% at 50% -8%,
+      color-mix(in srgb, var(--primary) 10%, transparent),
+      transparent 58%
     ),
-    radial-gradient(
-      ellipse 45% 35% at 95% 15%,
-      color-mix(in srgb, var(--tertiary) 22%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 40% 30% at 5% 85%,
-      color-mix(in srgb, var(--primary) 14%, transparent),
-      transparent 65%
-    ),
-    linear-gradient(180deg, #0a0f1c 0%, var(--surface) 45%, #05070d 100%);
+    linear-gradient(180deg, #0a0a0a 0%, #050505 42%, #000000 100%);
 }
 
 html[data-theme='dark'] body::after {
@@ -112,18 +113,16 @@ html[data-theme='dark'] body::after {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  opacity: 0.55;
+  opacity: 0.4;
   background-image:
     radial-gradient(1px 1px at 12% 18%, color-mix(in srgb, var(--moon) 90%, white), transparent),
-    radial-gradient(1px 1px at 28% 72%, rgba(255, 255, 255, 0.75), transparent),
-    radial-gradient(1.5px 1.5px at 44% 32%, rgba(255, 255, 255, 0.85), transparent),
+    radial-gradient(1px 1px at 28% 72%, rgba(255, 255, 255, 0.55), transparent),
+    radial-gradient(1.5px 1.5px at 44% 32%, rgba(255, 255, 255, 0.65), transparent),
     radial-gradient(1px 1px at 61% 8%, color-mix(in srgb, var(--primary) 70%, white), transparent),
-    radial-gradient(1px 1px at 73% 58%, rgba(255, 255, 255, 0.6), transparent),
-    radial-gradient(1px 1px at 88% 24%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 73% 58%, rgba(255, 255, 255, 0.45), transparent),
+    radial-gradient(1px 1px at 88% 24%, rgba(255, 255, 255, 0.5), transparent),
     radial-gradient(1px 1px at 92% 78%, color-mix(in srgb, var(--moon) 80%, white), transparent),
-    radial-gradient(1px 1px at 8% 42%, rgba(255, 255, 255, 0.55), transparent),
-    radial-gradient(1px 1px at 36% 91%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1px 1px at 52% 52%, rgba(255, 255, 255, 0.45), transparent);
+    radial-gradient(1px 1px at 8% 42%, rgba(255, 255, 255, 0.4), transparent);
   animation: sky-twinkle 14s var(--ease-in-out) infinite alternate;
 }
 
@@ -138,15 +137,13 @@ h3 {
 
 @keyframes sky-twinkle {
   from {
-    opacity: 0.4;
+    opacity: 0.28;
   }
   to {
-    opacity: 0.65;
+    opacity: 0.5;
   }
 }
 
-// Anyone who has asked their system to calm down gets a calm app. Cheap to
-// honour and the right default for a vestibular trigger like moving bars.
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -159,6 +156,6 @@ h3 {
 
   html[data-theme='dark'] body::after {
     animation: none;
-    opacity: 0.45;
+    opacity: 0.35;
   }
 }

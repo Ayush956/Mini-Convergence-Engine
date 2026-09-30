@@ -20,20 +20,20 @@ export type ColourTokens = {
   weak: string;
 };
 
-/** Night-sky astrology palette (existing dark look). */
+/** Near-black natal-chart palette, matching the reference calculator look. */
 export const darkColours: ColourTokens = {
-  surface: '#070a12',
-  'surface-container': '#0f1524',
-  'surface-container-high': '#171f33',
-  'on-surface': '#ede8dc',
-  'on-surface-variant': '#9aa3bc',
-  'outline-variant': '#2e3a5c',
+  surface: '#050505',
+  'surface-container': '#121212',
+  'surface-container-high': '#1a1a1a',
+  'on-surface': '#f4f0e6',
+  'on-surface-variant': '#b8b0a3',
+  'outline-variant': '#2a2a2a',
   primary: '#e4c76b',
   'on-primary': '#1a1408',
-  tertiary: '#a78bfa',
+  tertiary: '#d4a15a',
   error: '#f5a8a0',
-  nebula: '#5b3d8a',
-  moon: '#c5d0ef',
+  nebula: '#2a2218',
+  moon: '#e8dfc8',
   strong: '#6ee7d4',
   medium: '#d4a843',
   weak: '#5c6478',

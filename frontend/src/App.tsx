@@ -29,9 +29,8 @@ export function App() {
   const [slow, setSlow] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(isMobileScreen);
-  // Desktop keeps the rail open; phones start on the form and only open chat
-  // when the user taps Ask with AI.
-  const [assistantOpen, setAssistantOpen] = useState(() => !isMobileScreen());
+  // Closed until the user opens Ask with AI — desktop and phone alike.
+  const [assistantOpen, setAssistantOpen] = useState(false);
   const resultPanel = useRef<HTMLElement | null>(null);
   const slowTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -98,6 +97,7 @@ export function App() {
 
   return (
     <div className={`${styles.page} ${pageClass}`}>
+      <div className={styles.chakra} aria-hidden />
       <main className={`${styles.main} ${intakeFocus ? styles.mainIntake : ''}`}>
         <div className={intakeFocus ? styles.intakeWrap : undefined}>
           <header className={`${styles.masthead} ${intakeFocus ? styles.mastheadIntake : ''}`}>
@@ -184,6 +184,86 @@ export function App() {
             )}
           </section>
         )}
+
+        <footer className={styles.siteFooter}>
+          <p className={styles.footerEyebrow}>The five systems</p>
+          <p className={styles.footerLead}>
+            Each tradition is calculated on its own from the same birth record, then scored on
+            the same six traits so we can see where they happen to agree.
+          </p>
+          <ul className={styles.footerSystems}>
+            <li>
+              <span className={styles.footerIndex} aria-hidden>
+                01
+              </span>
+              <strong>Western sun sign</strong>
+              <span>Tropical ecliptic longitude — where the Sun stood at that moment.</span>
+            </li>
+            <li>
+              <span className={styles.footerIndex} aria-hidden>
+                02
+              </span>
+              <strong>Chinese zodiac</strong>
+              <span>Animal of the lunar year, using published New Year dates, not 1 January.</span>
+            </li>
+            <li>
+              <span className={styles.footerIndex} aria-hidden>
+                03
+              </span>
+              <strong>Life path</strong>
+              <span>Pythagorean reduction of the date, keeping master numbers 11, 22 and 33.</span>
+            </li>
+            <li>
+              <span className={styles.footerIndex} aria-hidden>
+                04
+              </span>
+              <strong>Chaldean name number</strong>
+              <span>Cheiro’s letter table on the name as entered, reduced to one digit.</span>
+            </li>
+            <li>
+              <span className={styles.footerIndex} aria-hidden>
+                05
+              </span>
+              <strong>Vedic vara</strong>
+              <span>Weekday lord from sunrise to sunrise; 06:00 IST stands in for true dawn.</span>
+            </li>
+          </ul>
+          <p className={styles.footerEyebrow}>The six traits</p>
+          <p className={styles.footerLead}>
+            Every method is scored 0–10 on the same six dimensions. A score of 7 or above
+            counts as agreement when we measure convergence.
+          </p>
+          <ul className={styles.footerTraits}>
+            <li>
+              <strong>Leadership</strong>
+              <span>Initiative, authority, and the will to take the first step.</span>
+            </li>
+            <li>
+              <strong>Creativity</strong>
+              <span>Invention, display, and how freely a result wants to make something new.</span>
+            </li>
+            <li>
+              <strong>Emotional depth</strong>
+              <span>Feeling, intuition, and how much inner weather the tradition assigns.</span>
+            </li>
+            <li>
+              <strong>Communication</strong>
+              <span>Speech, sociability, and the Mercury-like gift of putting things into words.</span>
+            </li>
+            <li>
+              <strong>Discipline</strong>
+              <span>Structure, persistence, and the earthy habit of finishing what was started.</span>
+            </li>
+            <li>
+              <strong>Risk appetite</strong>
+              <span>How far a result will go — impulse, extremes, or a careful refusal.</span>
+            </li>
+          </ul>
+          <p className={styles.footerNote}>
+            This is a comparison of five mappings, not a prediction. Time is treated as IST
+            because the brief never asks for a birthplace.
+          </p>
+        </footer>
       </main>
 
       {assistantOpen ? (

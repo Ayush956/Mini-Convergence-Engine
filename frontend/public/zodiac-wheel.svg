@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" fill="none" aria-hidden="true">
+  <g stroke="#b8860b" stroke-opacity="0.55" stroke-width="1.1">
+    <circle cx="400" cy="400" r="348"/>
+    <circle cx="400" cy="400" r="312"/>
+    <circle cx="400" cy="400" r="268"/>
+    <circle cx="400" cy="400" r="96"/>
+    <circle cx="400" cy="400" r="38"/>
+  </g>
+  <g stroke="#b8860b" stroke-opacity="0.4" stroke-width="0.8">
+    <line x1="400" y1="52" x2="400" y2="748"/>
+    <line x1="52" y1="400" x2="748" y2="400"/>
+    <line x1="152" y1="152" x2="648" y2="648"/>
+    <line x1="648" y1="152" x2="152" y2="648"/>
+    <line x1="226" y1="74" x2="574" y2="726"/>
+    <line x1="574" y1="74" x2="226" y2="726"/>
+    <line x1="74" y1="226" x2="726" y2="574"/>
+    <line x1="726" y1="226" x2="74" y2="574"/>
+  </g>
+  <g stroke="#b8860b" stroke-opacity="0.7" stroke-width="1.4">
+    <line x1="400" y1="52" x2="400" y2="78"/>
+    <line x1="400" y1="722" x2="400" y2="748"/>
+    <line x1="52" y1="400" x2="78" y2="400"/>
+    <line x1="722" y1="400" x2="748" y2="400"/>
+    <line x1="152" y1="152" x2="170" y2="170"/>
+    <line x1="630" y1="630" x2="648" y2="648"/>
+    <line x1="648" y1="152" x2="630" y2="170"/>
+    <line x1="170" y1="630" x2="152" y2="648"/>
+  </g>
+  <!-- Constellation traces, same idea as the reference wheel -->
+  <g stroke="#c45c26" stroke-opacity="0.35" stroke-width="0.9">
+    <polyline points="248,168 292,196 318,246 286,288 238,274"/>
+    <polyline points="538,154 572,208 548,262 598,286"/>
+    <polyline points="612,468 658,512 622,568 568,548"/>
+    <polyline points="188,488 164,546 214,590 258,552"/>
+    <polyline points="430,118 468,142 452,186"/>
+  </g>
+  <g fill="#b8860b" fill-opacity="0.45">
+    <circle cx="248" cy="168" r="2.2"/>
+    <circle cx="318" cy="246" r="1.8"/>
+    <circle cx="538" cy="154" r="2"/>
+    <circle cx="598" cy="286" r="1.6"/>
+    <circle cx="658" cy="512" r="2"/>
+    <circle cx="164" cy="546" r="1.7"/>
+    <circle cx="452" cy="186" r="1.5"/>
+    <circle cx="400" cy="400" r="3"/>
+  </g>
+</svg>
